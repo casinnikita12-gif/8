@@ -1,0 +1,3137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оперская монополия — Уголовное дело № 77/40-ОМ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=PT+Mono&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper-bg: #e7dcc6;
+            --paper-light: #f4ecdc;
+            --paper-dark: #d5c5a7;
+            --ink-main: #1c1915;
+            --ink-muted: #52493d;
+            --stamp-red: #991b1b;
+            --stamp-blue: #1e3a8a;
+            --border-dark: #2c261f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #26221d;
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(255, 248, 231, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.35) 0%, transparent 60%);
+            color: var(--ink-main);
+            font-family: 'PT Mono', 'Courier Prime', 'Courier New', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Текстура архивной бумаги */
+        .kraft-sheet {
+            background-color: var(--paper-bg);
+            background-image:
+                linear-gradient(rgba(44, 38, 31, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(44, 38, 31, 0.04) 1px, transparent 1px);
+            background-size: 24px 24px;
+            border: 2px solid var(--border-dark);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 40px rgba(133, 113, 82, 0.22);
+        }
+
+        .kraft-card {
+            background-color: var(--paper-light);
+            border: 1.5px solid var(--border-dark);
+            box-shadow: 2px 2px 0px rgba(44, 38, 31, 0.25);
+        }
+
+        /* Штемпели и печати */
+        .stamp-red {
+            border: 2px solid var(--stamp-red);
+            color: var(--stamp-red);
+            background-color: rgba(153, 27, 27, 0.06);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            transform: rotate(-1.5deg);
+            display: inline-block;
+        }
+
+        .stamp-blue {
+            border: 2px solid var(--stamp-blue);
+            color: var(--stamp-blue);
+            background-color: rgba(30, 58, 138, 0.06);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transform: rotate(1deg);
+            display: inline-block;
+        }
+
+        /* Кнопки в стиле архива */
+        .btn-case {
+            font-family: 'PT Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1.5px solid var(--border-dark);
+            background-color: var(--paper-light);
+            color: var(--ink-main);
+            padding: 0.5rem 0.9rem;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            box-shadow: 2px 2px 0px var(--border-dark);
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-case:hover:not(:disabled) {
+            background-color: #fffaf0;
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--border-dark);
+        }
+
+        .btn-case:active:not(:disabled) {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--border-dark);
+        }
+
+        .btn-case:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #1d4ed8;
+        }
+
+        .btn-danger {
+            background-color: #991b1b;
+            color: #ffffff;
+            border-color: #450a0a;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background-color: #b91c1c;
+        }
+
+        .btn-success {
+            background-color: #166534;
+            color: #ffffff;
+            border-color: #052e16;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background-color: #15803d;
+        }
+
+        /* Игровое поле 11x11 */
+        .board-wrapper {
+            width: 100%;
+            max-width: 860px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto;
+        }
+
+        .monopoly-board {
+            display: grid;
+            grid-template-columns: 1.45fr repeat(9, 1fr) 1.45fr;
+            grid-template-rows: 1.45fr repeat(9, 1fr) 1.45fr;
+            width: 100%;
+            height: 100%;
+            background-color: #cbb894;
+            border: 3px solid var(--border-dark);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+            position: relative;
+        }
+
+        .board-cell {
+            background-color: #f4ecdc;
+            border: 1px solid #3f362b;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background-color 0.15s ease, box-shadow 0.15s ease;
+            user-select: none;
+            padding: 1px;
+        }
+
+        .board-cell:hover {
+            background-color: #fffdf8;
+            z-index: 15;
+            box-shadow: inset 0 0 0 2px #1e3a8a;
+        }
+
+        .board-cell.active-highlight {
+            background-color: #fef3c7 !important;
+            box-shadow: inset 0 0 0 2.5px #b45309, 0 0 12px rgba(245, 158, 11, 0.7);
+            z-index: 20;
+        }
+
+        .board-cell.mortgaged {
+            background-color: #d6cfc2;
+            opacity: 0.78;
+        }
+
+        .board-cell.mortgaged::after {
+            content: "ЗАЛОГ";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-22deg);
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #991b1b;
+            border: 1px solid #991b1b;
+            padding: 0 2px;
+            background: rgba(255, 255, 255, 0.85);
+            pointer-events: none;
+        }
+
+        /* Полоска цвета сектора */
+        .sector-bar {
+            height: 11px;
+            width: 100%;
+            border-bottom: 1px solid #2c261f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            flex-shrink: 0;
+        }
+
+        .cell-title {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: clamp(0.46rem, 0.68vw, 0.64rem);
+            font-weight: 700;
+            line-height: 1.04;
+            text-align: center;
+            color: #1c1915;
+            padding: 1px 2px;
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        .cell-price {
+            font-family: 'PT Mono', monospace;
+            font-size: clamp(0.44rem, 0.62vw, 0.58rem);
+            font-weight: 700;
+            text-align: center;
+            color: #443b30;
+            padding-bottom: 1px;
+        }
+
+        .corner-cell {
+            background-color: #e6d7b9;
+            padding: 3px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .corner-cell .cell-title {
+            font-size: clamp(0.55rem, 0.8vw, 0.76rem);
+            text-transform: uppercase;
+        }
+
+        /* Метка владельца */
+        .owner-badge {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1px solid #000;
+            z-index: 5;
+        }
+
+        /* Фишки игроков на клетке */
+        .tokens-container {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            pointer-events: none;
+            z-index: 12;
+            padding: 2px;
+        }
+
+        .player-token {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: #ffffff;
+            transition: transform 0.2s ease;
+        }
+
+        .player-token.current-turn {
+            transform: scale(1.22);
+            box-shadow: 0 0 0 2px #1c1915, 0 0 10px #f59e0b;
+            z-index: 14;
+        }
+
+        /* Центральная зона внутри поля */
+        .board-center {
+            grid-column: 2 / 11;
+            grid-row: 2 / 11;
+            background-color: #eadcc1;
+            background-image: radial-gradient(circle at center, #f5eedf 0%, #e2d1b0 100%);
+            border: 2px solid var(--border-dark);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Кубики D6 */
+        .dice-box {
+            width: 44px;
+            height: 44px;
+            background-color: #fffdf9;
+            border: 2px solid #1c1915;
+            border-radius: 6px;
+            box-shadow: 2px 3px 0px #1c1915;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #1c1915;
+            transition: transform 0.15s ease;
+        }
+
+        .dice-rolling {
+            animation: diceShake 0.35s ease-in-out;
+        }
+
+        @keyframes diceShake {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-14deg) scale(1.12); }
+            50% { transform: rotate(12deg) scale(0.95); }
+            75% { transform: rotate(-8deg) scale(1.08); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        /* Скроллбар в стиле архива */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #d8c9ad;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6b5d4d;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f362b;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-4">
+
+    <!-- ЭКРАН 1: ЛОББИ / НАСТРОЙКА СМЕНЫ -->
+    <div id="lobby-screen" class="max-w-4xl mx-auto kraft-sheet p-5 md:p-8 rounded my-4">
+        <div class="flex flex-wrap justify-between items-start gap-3 border-b-2 border-[#2c261f] pb-4 mb-5">
+            <div>
+                <div class="text-xs font-bold uppercase tracking-widest text-[#52493d]">
+                    ГУ МВД России • Оперативно-розыскная часть • Отдел «Барвиха-Северное»
+                </div>
+                <h1 class="text-2xl md:text-3xl font-bold uppercase tracking-tight text-[#1c1915] mt-1">
+                    Оперская монополия
+                </h1>
+                <div class="text-sm font-bold text-[#991b1b] uppercase mt-0.5">
+                    Уголовное дело № 77/40-ОМ • Интерактивный протокол смены (Hot-Seat)
+                </div>
+            </div>
+            <div class="flex flex-col items-end gap-2">
+                <span class="stamp-red px-3 py-1 text-xs">Для служебного пользования</span>
+                <button onclick="openRulesModal()" class="btn-case text-xs">Справка и прайс-лист (22 точки)</button>
+            </div>
+        </div>
+
+        <div class="kraft-card p-4 mb-5 text-xs md:text-sm leading-relaxed">
+            <strong>ИНСТРУКТАЖ ПЕРЕД РАЗВОДОМ:</strong> Выберите формат игры: сетевую смену по прямой ссылке/коду комнаты на разных устройствах или классический режим «За одним экраном». Автоматический банк ведёт расчёт ренты, монополий, звёзд прокачки, фонда УСБ и матрицы кубиков.
+        </div>
+
+        <!-- Выбор режима игры -->
+        <div class="mb-5">
+            <label class="block text-xs font-bold uppercase mb-2">Режим дежурной смены:</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button type="button" onclick="switchLobbyMode('host')" id="mode-btn-host" class="btn-case btn-primary py-2.5">
+                    Создать смену (Хост)
+                </button>
+                <button type="button" onclick="switchLobbyMode('join')" id="mode-btn-join" class="btn-case py-2.5">
+                    Войти по коду / ссылке
+                </button>
+                <button type="button" onclick="switchLobbyMode('hotseat')" id="mode-btn-hotseat" class="btn-case py-2.5">
+                    За одним экраном (Hot-Seat)
+                </button>
+            </div>
+        </div>
+
+        <!-- ПАНЕЛЬ РЕЖИМА: СОЗДАТЬ СМЕНУ (ХОСТ) -->
+        <div id="lobby-panel-host" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="kraft-card p-3.5 rounded space-y-2.5 text-xs">
+                    <div class="font-bold uppercase border-b border-[#2c261f] pb-1.5 text-[#1e3a8a]">Ваше личное дело (Хост смены)</div>
+                    <div>
+                        <label class="block font-bold mb-1">Позывной / ФИО:</label>
+                        <input type="text" id="host-name" value="Капитан Громов" maxlength="22" oninput="updateHostPlayerInfo()" class="w-full p-1.5 bg-white border border-[#2c261f] font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Роль (Личное дело):</label>
+                        <select id="host-role" onchange="updateHostPlayerInfo()" class="w-full p-1.5 bg-white border border-[#2c261f] font-mono"></select>
+                    </div>
+                    <div id="host-role-desc" class="p-2 bg-[#e7dcc6] border border-[#b8ad9b] text-[11px] leading-snug"></div>
+                </div>
+
+                <div class="kraft-card p-3.5 rounded space-y-2.5 text-xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center border-b border-[#2c261f] pb-1.5 mb-2">
+                            <span class="font-bold uppercase text-[#991b1b]">Комната дежурства</span>
+                            <span id="host-peer-status" class="text-[10px] font-bold px-1.5 py-0.5 bg-[#fef3c7] border border-[#b45309] rounded">Инициализация...</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-[#52493d] block text-[11px]">Код смены для ввода вручную:</span>
+                            <div id="host-room-code" class="text-lg font-bold tracking-widest text-[#1c1915] bg-[#e7dcc6] border border-[#2c261f] px-3 py-1 inline-block mt-0.5 select-all">---</div>
+                        </div>
+                        <div>
+                            <span class="text-[#52493d] block text-[11px] mb-1">Прямая ссылка-приглашение для игроков:</span>
+                            <div class="flex gap-1.5">
+                                <input type="text" id="host-invite-link" readonly class="flex-1 p-1.5 bg-white border border-[#2c261f] text-[11px] font-mono">
+                                <button type="button" onclick="copyInviteLink()" id="btn-copy-link" class="btn-case btn-primary text-[11px] px-2.5 whitespace-nowrap">Скопировать</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-[#52493d] pt-1">
+                        Отправьте ссылку оперативникам. Допускается от 2 до 4 участников. Не закрывайте эту вкладку до конца партии.
+                    </div>
+                </div>
+            </div>
+
+            <div class="kraft-card p-3.5 rounded text-xs">
+                <div class="flex justify-between items-center border-b border-[#2c261f] pb-1.5 mb-2">
+                    <span class="font-bold uppercase">Личный состав в комнате ожидания (<span id="host-lobby-count">1</span>/4)</span>
+                    <span class="text-[11px] text-[#52493d]">Ожидание подключения...</span>
+                </div>
+                <div id="host-lobby-players" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 border-t-2 border-[#2c261f] pt-4">
+                <div class="text-xs text-[#52493d]">
+                    Стартовый оклад: <strong>1 500 тыс. ₽</strong> (Начальник ОБЭП — <strong>1 700 тыс. ₽</strong>).
+                </div>
+                <button id="btn-start-network-game" onclick="startNetworkGame()" class="btn-case btn-danger text-sm md:text-base px-6 py-3" disabled>
+                    Начать дежурство (нужно 2–4 игрока)
+                </button>
+            </div>
+        </div>
+
+        <!-- ПАНЕЛЬ РЕЖИМА: ПОДКЛЮЧИТЬСЯ К СМЕНЕ (КЛИЕНТ) -->
+        <div id="lobby-panel-join" class="hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="kraft-card p-3.5 rounded space-y-2.5 text-xs">
+                    <div class="font-bold uppercase border-b border-[#2c261f] pb-1.5 text-[#1e3a8a]">Параметры подключения</div>
+                    <div>
+                        <label class="block font-bold mb-1">Код комнаты (например, OP-7740):</label>
+                        <input type="text" id="join-room-code" placeholder="OP-XXXX" maxlength="12" class="w-full p-1.5 bg-white border border-[#2c261f] font-mono uppercase font-bold tracking-wider">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Ваш позывной / ФИО:</label>
+                        <input type="text" id="join-name" value="Майор Волкова" maxlength="22" class="w-full p-1.5 bg-white border border-[#2c261f] font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Выберите личное дело (Роль):</label>
+                        <select id="join-role" onchange="updateJoinRoleDesc()" class="w-full p-1.5 bg-white border border-[#2c261f] font-mono"></select>
+                    </div>
+                    <div id="join-role-desc" class="p-2 bg-[#e7dcc6] border border-[#b8ad9b] text-[11px] leading-snug"></div>
+                </div>
+
+                <div class="kraft-card p-3.5 rounded space-y-3 text-xs flex flex-col justify-between">
+                    <div>
+                        <div class="font-bold uppercase border-b border-[#2c261f] pb-1.5 mb-2 text-[#991b1b]">Статус связи с дежурной частью</div>
+                        <div id="join-status-box" class="p-2.5 bg-[#e7dcc6] border border-[#857865] rounded text-xs">
+                            Введите код комнаты (или откройте прямую ссылку) и нажмите <strong>«Подключиться к смене»</strong>.
+                        </div>
+                        <div id="join-lobby-players-wrap" class="hidden mt-3">
+                            <div class="font-bold uppercase text-[11px] mb-1">Состав смены в комнате:</div>
+                            <div id="join-lobby-players" class="space-y-1"></div>
+                        </div>
+                    </div>
+                    <button type="button" id="btn-connect-room" onclick="joinNetworkRoom()" class="btn-case btn-primary w-full py-2.5">
+                        Подключиться к смене
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ПАНЕЛЬ РЕЖИМА: ЗА ОДНИМ ЭКРАНОМ (HOT-SEAT) -->
+        <div id="lobby-panel-hotseat" class="hidden">
+            <div class="mb-5">
+                <label class="block text-xs font-bold uppercase mb-2">Количество оперативников на смене:</label>
+                <div class="flex gap-2">
+                    <button type="button" onclick="setPlayerCount(2)" id="cnt-btn-2" class="btn-case">2 оперативника</button>
+                    <button type="button" onclick="setPlayerCount(3)" id="cnt-btn-3" class="btn-case btn-primary">3 оперативника</button>
+                    <button type="button" onclick="setPlayerCount(4)" id="cnt-btn-4" class="btn-case">4 оперативника</button>
+                </div>
+            </div>
+
+            <div id="players-setup-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- Карточки настройки игроков генерируются JS -->
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 border-t-2 border-[#2c261f] pt-4">
+                <div class="text-xs text-[#52493d]">
+                    Стартовый оклад: <strong>1 500 тыс. ₽</strong> (Начальник ОБЭП — <strong>1 700 тыс. ₽</strong>). Стартовый фонд УСБ: <strong>100 тыс. ₽</strong>.
+                </div>
+                <button onclick="startHotSeatGame()" class="btn-case btn-danger text-sm md:text-base px-6 py-3">
+                    Открыть дело и начать смену
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: ОСНОВНОЙ ИГРОВОЙ СТОЛ -->
+    <div id="game-screen" class="hidden max-w-[1540px] mx-auto">
+        <!-- Верхняя плашка дела -->
+        <header class="kraft-sheet px-4 py-2 mb-3 flex flex-wrap items-center justify-between gap-2 rounded">
+            <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                <span class="stamp-red px-2 py-0.5 text-xs">Дело № 77/40-ОМ</span>
+                <span class="font-bold text-sm md:text-base uppercase">Оперская монополия</span>
+                <span class="text-xs text-[#52493d]">| Ход № <strong id="turn-counter">1</strong></span>
+                <span id="net-status-badge" class="hidden text-[11px] font-bold px-2 py-0.5 rounded bg-[#dcfce7] text-[#166534] border border-[#166534]">
+                    Связь: Активна
+                </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="kraft-card px-2.5 py-1 text-xs font-bold">
+                    Фонд УСБ (Премия): <span id="usb-fund-display" class="text-[#991b1b]">100 тыс. ₽</span>
+                </div>
+                <button id="btn-open-trade" onclick="openTradeModal()" class="btn-case text-xs">Сделка / Перевод</button>
+                <button onclick="openRulesModal()" class="btn-case text-xs">Прайс и Правила</button>
+                <button onclick="confirmRestart()" class="btn-case text-xs">Новое дело</button>
+            </div>
+        </header>
+
+        <!-- Основная сетка: Игровое поле слева + Делопроизводство справа -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-3 items-start">
+            <!-- Левая часть: Поле 11x11 -->
+            <div class="xl:col-span-8">
+                <div class="board-wrapper">
+                    <div id="monopoly-board" class="monopoly-board">
+                        <!-- 40 клеток поля + центральный блок генерируются JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая часть: Делопроизводство -->
+            <aside class="xl:col-span-4 flex flex-col gap-3">
+                <!-- Карточки оперативников -->
+                <div class="kraft-sheet p-3 rounded">
+                    <div class="flex justify-between items-center border-b border-[#2c261f] pb-1.5 mb-2">
+                        <h2 class="text-xs font-bold uppercase tracking-wider">Личный состав смены</h2>
+                        <span class="stamp-blue px-1.5 py-0.2 text-[10px]">Актив</span>
+                    </div>
+                    <div id="players-roster" class="flex flex-col gap-2">
+                        <!-- Карточки игроков -->
+                    </div>
+                </div>
+
+                <!-- Протокол смены (лог) -->
+                <div class="kraft-sheet p-3 rounded flex flex-col" style="height: 360px;">
+                    <div class="flex justify-between items-center border-b border-[#2c261f] pb-1.5 mb-2">
+                        <h2 class="text-xs font-bold uppercase tracking-wider">Протокол смены (Журнал операций)</h2>
+                        <span class="text-[10px] text-[#52493d]">Автозапись</span>
+                    </div>
+                    <div id="game-log" class="flex-1 overflow-y-auto text-xs space-y-1.5 pr-1 font-mono">
+                        <!-- Записи лога -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ИНСПЕКТОР КЛЕТКИ / УПРАВЛЕНИЕ АКТИВОМ -->
+    <div id="cell-modal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-3">
+        <div class="kraft-sheet max-w-md w-full p-5 rounded relative">
+            <div class="flex justify-between items-start mb-3">
+                <span id="cell-modal-sector" class="px-2 py-0.5 text-xs font-bold uppercase text-white rounded-sm">Сектор</span>
+                <button onclick="closeModal('cell-modal')" class="btn-case text-xs py-0.5 px-2">✕</button>
+            </div>
+            <h3 id="cell-modal-title" class="text-lg font-bold uppercase mb-2">Название точки</h3>
+            <div id="cell-modal-body" class="text-xs space-y-2 mb-4"></div>
+            <div id="cell-modal-actions" class="flex flex-wrap gap-2 justify-end border-t border-[#2c261f] pt-3"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: СДЕЛКА / ПЕРЕВОД СРЕДСТВ И ТОЧЕК -->
+    <div id="trade-modal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-3">
+        <div class="kraft-sheet max-w-lg w-full p-5 rounded">
+            <div class="flex justify-between items-center border-b border-[#2c261f] pb-2 mb-3">
+                <h3 class="text-base font-bold uppercase">Оперативная сделка (Перевод средств / Передача точки)</h3>
+                <button onclick="closeModal('trade-modal')" class="btn-case text-xs py-0.5 px-2">✕</button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold mb-1">От кого (Оперативник):</label>
+                        <select id="trade-from" onchange="updateTradeForm()" class="w-full p-1.5 kraft-card font-mono"></select>
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Кому (Получатель):</label>
+                        <select id="trade-to" class="w-full p-1.5 kraft-card font-mono"></select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Сумма перевода (тыс. ₽):</label>
+                    <input type="number" id="trade-amount" value="0" min="0" step="10" class="w-full p-1.5 kraft-card font-mono">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Передать точку в собственность (необязательно):</label>
+                    <select id="trade-property" class="w-full p-1.5 kraft-card font-mono">
+                        <option value="">— Без передачи точки —</option>
+                    </select>
+                </div>
+                <div id="trade-error" class="text-[#991b1b] font-bold hidden"></div>
+            </div>
+            <div class="flex justify-end gap-2 mt-4 border-t border-[#2c261f] pt-3">
+                <button onclick="closeModal('trade-modal')" class="btn-case">Отмена</button>
+                <button onclick="executeTrade()" class="btn-case btn-primary">Подписать акт передачи</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: СПРАВКА, РОЛИ, МАТРИЦА КУБИКОВ И ПРАЙС-ЛИСТ -->
+    <div id="rules-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-3">
+        <div class="kraft-sheet max-w-4xl w-full max-h-[90vh] flex flex-col rounded">
+            <div class="flex justify-between items-center p-4 border-b-2 border-[#2c261f]">
+                <div>
+                    <span class="stamp-red px-2 py-0.5 text-[10px]">Приложение к делу № 77/40-ОМ</span>
+                    <h3 class="text-lg font-bold uppercase mt-1">Служебный регламент и Прайс-лист округа</h3>
+                </div>
+                <button onclick="closeModal('rules-modal')" class="btn-case">Закрыть ✕</button>
+            </div>
+            <div class="p-4 overflow-y-auto text-xs space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="kraft-card p-3">
+                        <h4 class="font-bold uppercase text-[#991b1b] mb-1.5">Личные дела (Роли оперативников)</h4>
+                        <ul class="space-y-1.5">
+                            <li><strong>Старый опер:</strong> +15% к зарплате за круг (<strong>230 тыс. ₽</strong> вместо 200 тыс. ₽) и <strong>скидка 10%</strong> на прокачку точек.</li>
+                            <li><strong>Следователь-аналитик:</strong> платит на <strong>20% меньше аренды</strong> на чужих точках и получает <strong>+50 тыс. ₽</strong> при попадании на клетки «Архив / Рапорт».</li>
+                            <li><strong>Начальник ОБЭП:</strong> получает на <strong>25% больше аренды</strong> со своих монопольных секторов и стартует с капиталом <strong>1 700 тыс. ₽</strong>.</li>
+                            <li><strong>Оперативник-инсайдер:</strong> получает <strong>скидку 15%</strong> при покупке любых свободных точек и <strong>не платит штраф</strong> при первой проверке УСБ за партию.</li>
+                        </ul>
+                    </div>
+                    <div class="kraft-card p-3">
+                        <h4 class="font-bold uppercase text-[#1e3a8a] mb-1.5">Матрица комбинаций кубиков</h4>
+                        <ul class="space-y-1.5">
+                            <li><strong>Дубль 1-1:</strong> Бонус из казны <strong>+50 тыс. ₽</strong> («Удачный обход»).</li>
+                            <li><strong>Дубль 2-2 / 4-4 / 5-5:</strong> Повторный бросок кубиков.</li>
+                            <li><strong>Дубль 3-3:</strong> Внеочередная премия <strong>+75 тыс. ₽</strong> из казны.</li>
+                            <li><strong>Дубль 6-6:</strong> Объявляется <strong>«План Перехват»</strong> — вся аренда на поле удваивается (×2) на 1 полный круг!</li>
+                            <li><strong>Комбинация 3+4 (или 4+3):</strong> <strong>Бесплатная прокачка (+1 уровень)</strong> любой вашей точки (если есть).</li>
+                            <li><strong>3 дубля подряд:</strong> Немедленный вызов в УСБ (отправка в ИВС на клетку 10).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="kraft-card p-3">
+                    <h4 class="font-bold uppercase mb-2">Прайс-лист всех 22 коммерческих точек (тыс. ₽)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse border border-[#2c261f] text-left">
+                            <thead>
+                                <tr class="bg-[#2c261f] text-white">
+                                    <th class="p-1.5 border border-[#2c261f]">Сектор</th>
+                                    <th class="p-1.5 border border-[#2c261f]">Название точки</th>
+                                    <th class="p-1.5 border border-[#2c261f]">Цена</th>
+                                    <th class="p-1.5 border border-[#2c261f]">Залог</th>
+                                    <th class="p-1.5 border border-[#2c261f]">Апгр.</th>
+                                    <th class="p-1.5 border border-[#2c261f]">База</th>
+                                    <th class="p-1.5 border border-[#2c261f]">Монополия</th>
+                                    <th class="p-1.5 border border-[#2c261f]">1★ Пост</th>
+                                    <th class="p-1.5 border border-[#2c261f]">2★★ Отдел</th>
+                                    <th class="p-1.5 border border-[#2c261f]">3★★★ Штаб</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rules-price-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ПОДТВЕРЖДЕНИЕ СБРОСА / ФИНАЛ ИГРЫ -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-3">
+        <div class="kraft-sheet max-w-md w-full p-5 rounded text-center">
+            <span class="stamp-red px-2 py-0.5 text-xs mb-2">Внимание</span>
+            <h3 id="confirm-title" class="text-lg font-bold uppercase mb-2">Закрыть текущее дело?</h3>
+            <p id="confirm-text" class="text-xs mb-4">Текущий прогресс смены будет аннулирован, и вы вернётесь в экран настройки.</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="closeModal('confirm-modal')" class="btn-case">Отмена</button>
+                <button id="confirm-yes-btn" class="btn-case btn-danger">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           ДАННЫЕ ИГРЫ: РОЛИ, ЦВЕТА, СЕКТОРЫ, ПОЛЕ НА 40 КЛЕТОК И КАРТОЧКИ СОБЫТИЙ
+           ========================================================================== */
+        const ROLES = [
+            {
+                id: 'veteran',
+                name: 'Старый опер',
+                badge: 'Опыт +15%',
+                startCash: 1500,
+                desc: '+15% к зарплате за круг (230 тыс. ₽ вместо 200 тыс. ₽) и скидка 10% на прокачку точек.'
+            },
+            {
+                id: 'analyst',
+                name: 'Следователь-аналитик',
+                badge: 'Аренда −20%',
+                startCash: 1500,
+                desc: 'Платит на 20% меньше аренды на чужих точках и получает +50 тыс. ₽ при попадании на «Рапорт / Событие».'
+            },
+            {
+                id: 'obep',
+                name: 'Начальник ОБЭП',
+                badge: 'Старт 1700 т.₽',
+                startCash: 1700,
+                desc: 'Стартует с капиталом 1 700 тыс. ₽ и получает на 25% больше аренды со своих монопольных секторов.'
+            },
+            {
+                id: 'insider',
+                name: 'Оперативник-инсайдер',
+                badge: 'Скидка 15%',
+                startCash: 1500,
+                desc: 'Скидка 15% при покупке любых свободных точек и иммунитет при первой проверке УСБ за партию.'
+            }
+        ];
+
+        const PLAYER_COLORS = [
+            { hex: '#991b1b', name: 'Красный' },
+            { hex: '#1e3a8a', name: 'Синий' },
+            { hex: '#166534', name: 'Зелёный' },
+            { hex: '#b45309', name: 'Янтарный' }
+        ];
+
+        const SECTORS = {
+            brown:  { name: 'Коричневый', color: '#78350f', count: 2 },
+            cyan:   { name: 'Голубой',    color: '#0284c7', count: 3 },
+            pink:   { name: 'Розовый',    color: '#db2777', count: 3 },
+            orange: { name: 'Оранжевый',  color: '#ea580c', count: 3 },
+            red:    { name: 'Красный',    color: '#dc2626', count: 3 },
+            yellow: { name: 'Жёлтый',     color: '#ca8a04', count: 3 },
+            green:  { name: 'Зелёный',    color: '#16a34a', count: 3 },
+            blue:   { name: 'Синий',      color: '#1d4ed8', count: 2 }
+        };
+
+        // 40 клеток маршрута (0 — правый нижний угол, далее по часовой стрелке)
+        const BOARD_CELLS = [
+            { id: 0,  type: 'start',   name: 'ДЕЖУРНАЯ ЧАСТЬ (СТАРТ)', sub: 'Оклад +200 т.₽' },
+            { id: 1,  type: 'prop',    sector: 'brown',  name: 'Ларёк у вокзала', price: 60,  upgradeCost: 50,  rents: [10, 20, 45, 110, 220] },
+            { id: 2,  type: 'event',   name: 'ОПЕРАТИВНАЯ СВОДКА', sub: 'Тяните карту' },
+            { id: 3,  type: 'prop',    sector: 'brown',  name: 'Ночной автосервис', price: 60, upgradeCost: 50, rents: [12, 24, 55, 130, 260] },
+            { id: 4,  type: 'tax',     name: 'НАЛОГ НА ОБОРОТ', amount: 150, sub: '−150 т.₽ в фонд' },
+            { id: 5,  type: 'hub',     name: 'КПП «Северный»', price: 200, sub: 'Спецобъект 200' },
+            { id: 6,  type: 'prop',    sector: 'cyan',   name: 'Подпольный ломбард', price: 100, upgradeCost: 50, rents: [16, 32, 75, 180, 350] },
+            { id: 7,  type: 'report',  name: 'РАПОРТ / СОБЫТИЕ', sub: 'Архив дела' },
+            { id: 8,  type: 'prop',    sector: 'cyan',   name: 'Шиномонтаж «У Ашота»', price: 100, upgradeCost: 50, rents: [16, 32, 75, 180, 350] },
+            { id: 9,  type: 'prop',    sector: 'cyan',   name: 'Склад конфиската', price: 120, upgradeCost: 50, rents: [20, 40, 90, 210, 400] },
+
+            { id: 10, type: 'jail',    name: 'ИВС / ПРОВЕРКА УСБ', sub: 'Просто заглянул' },
+            { id: 11, type: 'prop',    sector: 'pink',   name: 'Автомойка «Люкс»', price: 140, upgradeCost: 100, rents: [24, 48, 110, 260, 480] },
+            { id: 12, type: 'utility', name: 'Городская связь', price: 150, sub: 'Инфра 150' },
+            { id: 13, type: 'prop',    sector: 'pink',   name: 'Салон красоты «Элит»', price: 140, upgradeCost: 100, rents: [24, 48, 110, 260, 480] },
+            { id: 14, type: 'prop',    sector: 'pink',   name: 'Кофейня на Рублёвке', price: 160, upgradeCost: 100, rents: [28, 56, 130, 300, 540] },
+            { id: 15, type: 'hub',     name: 'Центральный Вокзал', price: 200, sub: 'Спецобъект 200' },
+            { id: 16, type: 'prop',    sector: 'orange', name: 'Караоке-бар «Берлога»', price: 180, upgradeCost: 100, rents: [32, 64, 150, 340, 600] },
+            { id: 17, type: 'event',   name: 'ОПЕРАТИВНАЯ СВОДКА', sub: 'Тяните карту' },
+            { id: 18, type: 'prop',    sector: 'orange', name: 'Ночной клуб «Эклипс»', price: 180, upgradeCost: 100, rents: [32, 64, 150, 340, 600] },
+            { id: 19, type: 'prop',    sector: 'orange', name: 'Подпольный покер-клуб', price: 200, upgradeCost: 100, rents: [36, 72, 170, 380, 660] },
+
+            { id: 20, type: 'reserve', name: 'ОПЕРАТИВНЫЙ РЕЗЕРВ', sub: 'Премия фонда' },
+            { id: 21, type: 'prop',    sector: 'red',    name: 'Бутик мехов и кожи', price: 220, upgradeCost: 150, rents: [40, 80, 190, 420, 720] },
+            { id: 22, type: 'report',  name: 'РАПОРТ / СОБЫТИЕ', sub: 'Архив дела' },
+            { id: 23, type: 'prop',    sector: 'red',    name: 'Автосалон спорткаров', price: 220, upgradeCost: 150, rents: [40, 80, 190, 420, 720] },
+            { id: 24, type: 'prop',    sector: 'red',    name: 'Ресторан «Царская охота»', price: 240, upgradeCost: 150, rents: [44, 88, 210, 460, 780] },
+            { id: 25, type: 'hub',     name: 'Аэропорт «Внуково-VIP»', price: 200, sub: 'Спецобъект 200' },
+            { id: 26, type: 'prop',    sector: 'yellow', name: 'Обнал-контора «Вектор»', price: 260, upgradeCost: 150, rents: [48, 96, 230, 500, 840] },
+            { id: 27, type: 'prop',    sector: 'yellow', name: 'Стройка элитного ЖК', price: 260, upgradeCost: 150, rents: [48, 96, 230, 500, 840] },
+            { id: 28, type: 'utility', name: 'Энергосеть округа', price: 150, sub: 'Инфра 150' },
+            { id: 29, type: 'prop',    sector: 'yellow', name: 'Таможенный терминал', price: 280, upgradeCost: 150, rents: [52, 104, 250, 540, 900] },
+
+            { id: 30, type: 'gotojail',name: 'ВЫЗОВ В УСБ (В ИВС!)', sub: 'Этап на кл. 10' },
+            { id: 31, type: 'prop',    sector: 'green',  name: 'Казино «Бриллиант»', price: 300, upgradeCost: 200, rents: [58, 116, 280, 600, 980] },
+            { id: 32, type: 'prop',    sector: 'green',  name: 'Частный яхт-клуб', price: 300, upgradeCost: 200, rents: [58, 116, 280, 600, 980] },
+            { id: 33, type: 'event',   name: 'ОПЕРАТИВНАЯ СВОДКА', sub: 'Тяните карту' },
+            { id: 34, type: 'prop',    sector: 'green',  name: 'Ювелирный дом', price: 320, upgradeCost: 200, rents: [64, 128, 310, 660, 1060] },
+            { id: 35, type: 'hub',     name: 'Грузовой Порт', price: 200, sub: 'Спецобъект 200' },
+            { id: 36, type: 'report',  name: 'РАПОРТ / СОБЫТИЕ', sub: 'Архив дела' },
+            { id: 37, type: 'prop',    sector: 'blue',   name: 'Бизнес-центр «Цитадель»', price: 350, upgradeCost: 200, rents: [75, 150, 360, 760, 1200] },
+            { id: 38, type: 'tax',     name: 'СБОР В ФОНД УСБ', amount: 100, sub: '−100 т.₽ в фонд' },
+            { id: 39, type: 'prop',    sector: 'blue',   name: 'Резиденция «Барвиха»', price: 400, upgradeCost: 200, rents: [95, 190, 450, 950, 1500] }
+        ];
+
+        const EVENT_CARDS = [
+            { title: 'Премия за раскрываемость', desc: 'Отдел отметил ваши показатели. Получите из казны +150 тыс. ₽.', type: 'cash', amount: 150 },
+            { title: 'Наводка от информатора', desc: 'Ценные сведения о конкурентах приносят +100 тыс. ₽ из казны.', type: 'cash', amount: 100 },
+            { title: 'Штраф за нарушение отчётности', desc: 'Канцелярия выявила ошибки в деле. Уплатите 100 тыс. ₽ в фонд УСБ.', type: 'fine', amount: 100 },
+            { title: 'Ремонт служебного транспорта', desc: 'Внеплановое ТО опергруппы. Уплатите 80 тыс. ₽ в фонд УСБ.', type: 'fine', amount: 80 },
+            { title: 'Срочный выезд в Дежурную часть', desc: 'Переместитесь на клетку 0 (Старт) и получите полный оклад.', type: 'move', target: 0, collectStart: true },
+            { title: 'Внеплановая проверка УСБ!', desc: 'Поступил анонимный рапорт. Вы отправляетесь в ИВС (клетка 10)!', type: 'jail' },
+            { title: 'Сбор с коллег на юбилей полковника', desc: 'Каждый другой оперативник переводит вам по 40 тыс. ₽.', type: 'collect_players', amount: 40 },
+            { title: 'Рейд по точкам округа', desc: 'Переместитесь на «Оперативный резерв» (клетка 20) и заберите накопленный фонд.', type: 'move', target: 20, collectStart: false },
+            { title: 'Конфискация левой партии', desc: 'Удачная операция! Получите +120 тыс. ₽ из казны.', type: 'cash', amount: 120 },
+            { title: 'Проверка пожарной инспекции на точках', desc: 'Оплатите по 25 тыс. ₽ в фонд УСБ за каждую вашу точку на поле.', type: 'prop_tax', perProp: 25 }
+        ];
+
+        const LEVEL_NAMES = ['База', '1★ Опер-пост', '2★★ Спецотдел', '3★★★ Штаб/Крыша'];
+
+        /* ==========================================================================
+           СОСТОЯНИЕ ИГРЫ (STATE) И СЕТЕВОЙ ДВИЖОК PEERJS
+           ========================================================================== */
+        let setupCount = 3;
+        let gameState = null;
+        let lobbyMode = 'host'; // 'host' | 'join' | 'hotseat'
+
+        const netState = {
+            isNetwork: false,
+            isHost: false,
+            peer: null,
+            roomCode: '',
+            myPeerId: '',
+            myPlayerIdx: null,
+            transport: 'peerjs',
+            connections: [], // у Хоста: [{ conn, peerId, name, roleId }]
+            hostConn: null,  // у Клиента: DataConnection к Хосту
+            lobbyRoster: [], // список игроков в комнате ожидания
+            lastProcessedSeq: {}
+        };
+
+        const PEER_PREFIX = 'operskaya-monopoliya-7740-';
+        // Опциональный URL облачной базы Firebase Realtime Database (например: https://your-project-default-rtdb.firebaseio.com).
+        // Если не задан, используется встроенный бесплатный HTTP-канал (ntfy.sh) без регистрации и WebRTC.
+        const CLOUD_RTDB_URL = '';
+        const PUBLIC_RELAY_BASE = 'https://ntfy.sh';
+        const PEER_SIGNALING_SERVERS = [
+            { label: 'PeerJS Cloud (443)', opts: { host: '0.peerjs.com', port: 443, secure: true, path: '/' }, probeUrl: 'https://0.peerjs.com/' },
+            { label: 'PeerJS Cloud (/peerjs)', opts: { host: '0.peerjs.com', port: 443, secure: true, path: '/peerjs' }, probeUrl: 'https://0.peerjs.com/peerjs' },
+            { label: 'PeerJS Cloud (9000)', opts: { host: '0.peerjs.com', port: 9000, secure: true, path: '/' }, probeUrl: 'https://0.peerjs.com:9000/' },
+            { label: 'PeerJS Relay Alt', opts: { host: 'peerjs.herokuapp.com', port: 443, secure: true, path: '/' }, probeUrl: 'https://peerjs.herokuapp.com/' }
+        ];
+        const PEER_CONFIG = {
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun.cloudflare.com:3478' },
+                    { urls: 'stun:global.stun.twilio.com:3478' },
+                    {
+                        urls: 'turn:openrelay.metered.ca:80',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:relay1.expresstech.io:80',
+                        username: 'ef7d9963c1b5d3b4',
+                        credential: '9f8e7d6c5b4a3210'
+                    }
+                ],
+                iceCandidatePoolSize: 4
+            }
+        };
+
+        function buildPeerOptions(serverPreset) {
+            return Object.assign({}, serverPreset.opts, {
+                config: PEER_CONFIG.config,
+                pingInterval: 4000,
+                debug: 0
+            });
+        }
+
+        function probeReachability(url, timeoutMs = 2200) {
+            if (!url || typeof fetch !== 'function') return Promise.resolve(true);
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timer = setTimeout(() => {
+                if (controller) {
+                    try { controller.abort(); } catch (e) {}
+                }
+            }, timeoutMs);
+
+            return fetch(url, {
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'no-store',
+                signal: controller ? controller.signal : undefined
+            })
+                .then(() => {
+                    clearTimeout(timer);
+                    return true;
+                })
+                .catch(() => {
+                    clearTimeout(timer);
+                    return false;
+                });
+        }
+
+        function isMyTurn() {
+            if (!gameState || gameState.winner) return false;
+            if (!netState.isNetwork) return true;
+            return gameState.currentPlayerIdx === netState.myPlayerIdx;
+        }
+
+        function getMyPlayerId() {
+            if (!netState.isNetwork) return gameState.currentPlayerIdx;
+            return netState.myPlayerIdx;
+        }
+
+        // Инициализация лобби
+        function initLobby() {
+            populateRoleSelect('host-role', 0);
+            populateRoleSelect('join-role', 1);
+            updateHostPlayerInfo();
+            updateJoinRoleDesc();
+            setPlayerCount(3);
+            renderRulesTable();
+
+            // Проверка параметра ?room=КОД в адресной строке
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get('room');
+            if (roomParam && roomParam.trim()) {
+                document.getElementById('join-room-code').value = roomParam.trim().toUpperCase();
+                switchLobbyMode('join');
+            } else {
+                // По умолчанию запускаем локальный режим (безопасно для песочницы без WebSocket)
+                switchLobbyMode('hotseat');
+            }
+        }
+
+        function populateRoleSelect(selectId, defaultIdx) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            sel.innerHTML = ROLES.map((r, idx) =>
+                `<option value="${r.id}" ${idx === defaultIdx ? 'selected' : ''}>${r.name} (${r.badge})</option>`
+            ).join('');
+        }
+
+        function switchLobbyMode(mode) {
+            lobbyMode = mode;
+            ['host', 'join', 'hotseat'].forEach(m => {
+                const btn = document.getElementById(`mode-btn-${m}`);
+                const panel = document.getElementById(`lobby-panel-${m}`);
+                if (btn) btn.classList.toggle('btn-primary', m === mode);
+                if (panel) panel.classList.toggle('hidden', m !== mode);
+            });
+
+            if (mode === 'host' && !netState.peer) {
+                initHostPeer();
+            }
+        }
+
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = 'OP-';
+            for (let i = 0; i < 4; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function initHostPeer() {
+            if (typeof Peer === 'undefined') {
+                document.getElementById('host-peer-status').textContent = 'Ошибка загрузки PeerJS';
+                return;
+            }
+            destroyPeer();
+
+            const code = generateRoomCode();
+            netState.roomCode = code;
+            netState.isHost = true;
+            netState.connections = [];
+
+            const statusEl = document.getElementById('host-peer-status');
+            statusEl.textContent = 'Подключение к сети...';
+            statusEl.className = 'text-[10px] font-bold px-1.5 py-0.5 bg-[#fef3c7] border border-[#b45309] rounded';
+
+            let serverIdx = 0;
+            let opened = false;
+            let switchTimer = null;
+            let isSwitching = false;
+
+            function tryNextHostServer(reasonText) {
+                if (opened || isSwitching) return;
+                isSwitching = true;
+                clearTimeout(switchTimer);
+                if (netState.peer) {
+                    try { netState.peer.destroy(); } catch (e) {}
+                    netState.peer = null;
+                }
+
+                if (serverIdx >= PEER_SIGNALING_SERVERS.length) {
+                    isSwitching = false;
+                    netState.isHost = false;
+                    document.getElementById('host-room-code').textContent = code;
+                    enableCloudHostFallback(code, statusEl);
+                    rebuildHostLobbyRoster();
+                    return;
+                }
+
+                const preset = PEER_SIGNALING_SERVERS[serverIdx++];
+                statusEl.textContent = `Проверка узла ${serverIdx}/${PEER_SIGNALING_SERVERS.length}...`;
+
+                probeReachability(preset.probeUrl, 2200).then((reachable) => {
+                    if (opened || netState.roomCode !== code) {
+                        isSwitching = false;
+                        return;
+                    }
+                    if (!reachable) {
+                        isSwitching = false;
+                        tryNextHostServer(`${preset.label} недоступен`);
+                        return;
+                    }
+
+                    statusEl.textContent = `Подключение (${preset.label})...`;
+                    let peer;
+                    try {
+                        peer = new Peer(PEER_PREFIX + code, buildPeerOptions(preset));
+                    } catch (err) {
+                        isSwitching = false;
+                        tryNextHostServer('ошибка WebSocket');
+                        return;
+                    }
+                    netState.peer = peer;
+                    isSwitching = false;
+
+                    switchTimer = setTimeout(() => {
+                        if (!opened && netState.peer === peer) {
+                            tryNextHostServer('таймаут ответа');
+                        }
+                    }, 4200);
+
+                    peer.on('open', (id) => {
+                        if (opened || netState.peer !== peer) return;
+                        opened = true;
+                        clearTimeout(switchTimer);
+                        netState.myPeerId = id;
+                        statusEl.textContent = `Связь: Активна (${preset.label})`;
+                        statusEl.className = 'text-[10px] font-bold px-1.5 py-0.5 bg-[#dcfce7] text-[#166534] border border-[#166534] rounded';
+
+                        document.getElementById('host-room-code').textContent = code;
+                        const inviteUrl = new URL(window.location.href);
+                        inviteUrl.searchParams.set('room', code);
+                        document.getElementById('host-invite-link').value = inviteUrl.toString();
+
+                        rebuildHostLobbyRoster();
+                    });
+
+                    peer.on('connection', (conn) => {
+                        conn.on('open', () => {
+                            if (gameState) {
+                                conn.send({ type: 'error', message: 'Дежурная смена уже начата.' });
+                                setTimeout(() => conn.close(), 300);
+                                return;
+                            }
+                            if (netState.connections.length >= 3) {
+                                conn.send({ type: 'error', message: 'Комната заполнена (максимум 4 оперативника).' });
+                                setTimeout(() => conn.close(), 300);
+                                return;
+                            }
+                        });
+
+                        conn.on('data', (data) => {
+                            handleHostIncomingData(conn, data);
+                        });
+
+                        conn.on('close', () => {
+                            netState.connections = netState.connections.filter(c => c.conn !== conn);
+                            if (!gameState) {
+                                rebuildHostLobbyRoster();
+                                broadcastLobbyRoster();
+                            } else {
+                                updateNetBadge();
+                                addLog('Внимание: один из удалённых оперативников потерял соединение.', 'warn');
+                            }
+                        });
+                    });
+
+                    peer.on('error', (err) => {
+                        if (!opened && netState.peer === peer) {
+                            tryNextHostServer(err && err.type ? err.type : 'ошибка узла');
+                        }
+                    });
+                });
+            }
+
+            tryNextHostServer('');
+        }
+
+        function enableCloudHostFallback(code, statusEl) {
+            netState.isHost = true;
+            netState.isNetwork = true;
+            netState.transport = 'cloud';
+            netState.lastProcessedSeq = {};
+            statusEl.textContent = 'Связь: Активна (Облачный канал)';
+            statusEl.className = 'text-[10px] font-bold px-1.5 py-0.5 bg-[#dcfce7] text-[#166534] border border-[#166534] rounded';
+            const inviteUrl = new URL(window.location.href);
+            inviteUrl.searchParams.set('room', code);
+            inviteUrl.searchParams.set('cloud', '1');
+            document.getElementById('host-invite-link').value = inviteUrl.toString();
+            startCloudHostLoop(code);
+        }
+
+        function getCloudRoomEndpoints(code) {
+            const safeTopic = 'om7740_' + code.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+            if (CLOUD_RTDB_URL) {
+                const base = CLOUD_RTDB_URL.replace(/\/+$/, '');
+                return {
+                    mode: 'firebase',
+                    roomUrl: `${base}/rooms/${encodeURIComponent(code)}.json`,
+                    reqUrl: (peerId) => `${base}/rooms/${encodeURIComponent(code)}/requests/${encodeURIComponent(peerId)}.json`
+                };
+            }
+            return {
+                mode: 'ntfy',
+                hostTopicUrl: `${PUBLIC_RELAY_BASE}/${safeTopic}_host`,
+                clientTopicUrl: `${PUBLIC_RELAY_BASE}/${safeTopic}_join`
+            };
+        }
+
+        let cloudPollTimer = null;
+        function startCloudHostLoop(code) {
+            clearInterval(cloudPollTimer);
+            const ep = getCloudRoomEndpoints(code);
+            rebuildHostLobbyRoster();
+            pushCloudRoomSnapshot(ep, code);
+
+            let lastEventTime = Math.floor(Date.now() / 1000) - 5;
+
+            cloudPollTimer = setInterval(async () => {
+                if (!netState.isHost || netState.transport !== 'cloud') return;
+                try {
+                    if (ep.mode === 'firebase') {
+                        const res = await fetch(ep.roomUrl);
+                        const snap = await res.json();
+                        if (!snap || !snap.requests) return;
+                        let changed = false;
+                        Object.keys(snap.requests).forEach(reqKey => {
+                            const req = snap.requests[reqKey];
+                            if (!req || !req.peerId) return;
+                            const exists = netState.connections.some(c => c.peerId === req.peerId);
+                            if (!exists && netState.connections.length < 3) {
+                                netState.connections.push({
+                                    conn: null,
+                                    peerId: req.peerId,
+                                    name: req.name || 'Оперативник',
+                                    roleId: req.roleId || ROLES[1].id
+                                });
+                                changed = true;
+                            }
+                            if (req.action && gameState) {
+                                const senderIdx = gameState.players.findIndex(p => p.peerId === req.peerId);
+                                if (senderIdx !== -1 && req.actionSeq && req.actionSeq !== netState.lastProcessedSeq[req.peerId]) {
+                                    netState.lastProcessedSeq[req.peerId] = req.actionSeq;
+                                    handleHostIncomingData(null, Object.assign({ peerId: req.peerId }, req.action));
+                                }
+                            }
+                        });
+                        if (changed) {
+                            rebuildHostLobbyRoster();
+                        }
+                        await pushCloudRoomSnapshot(ep, code);
+                    } else {
+                        const pollUrl = `${ep.clientTopicUrl}/json?since=${lastEventTime}`;
+                        const res = await fetch(pollUrl, { cache: 'no-store' });
+                        if (!res.ok) return;
+                        const text = await res.text();
+                        const lines = text.trim().split('\n').filter(Boolean);
+                        let changed = false;
+                        let stateMutated = false;
+
+                        for (const line of lines) {
+                            let evt;
+                            try { evt = JSON.parse(line); } catch (e) { continue; }
+                            if (evt.time && evt.time > lastEventTime) {
+                                lastEventTime = evt.time;
+                            }
+                            if (evt.event !== 'message' || !evt.message) continue;
+                            let msg;
+                            try { msg = JSON.parse(evt.message); } catch (e) { continue; }
+                            if (!msg || !msg.peerId) continue;
+
+                            if (msg.type === 'join_request') {
+                                const exists = netState.connections.some(c => c.peerId === msg.peerId);
+                                if (!exists && netState.connections.length < 3) {
+                                    netState.connections.push({
+                                        conn: null,
+                                        peerId: msg.peerId,
+                                        name: msg.name || 'Оперативник',
+                                        roleId: msg.roleId || ROLES[1].id
+                                    });
+                                    changed = true;
+                                }
+                            } else if (msg.type === 'action' && gameState) {
+                                const senderIdx = gameState.players.findIndex(p => p.peerId === msg.peerId);
+                                if (senderIdx !== -1 && msg.actionSeq && msg.actionSeq !== netState.lastProcessedSeq[msg.peerId]) {
+                                    netState.lastProcessedSeq[msg.peerId] = msg.actionSeq;
+                                    handleHostIncomingData(null, Object.assign({ peerId: msg.peerId }, msg.action));
+                                    stateMutated = true;
+                                }
+                            }
+                        }
+
+                        if (changed) {
+                            rebuildHostLobbyRoster();
+                            await pushCloudRoomSnapshot(ep, code);
+                        } else if (stateMutated) {
+                            await pushCloudRoomSnapshot(ep, code);
+                        }
+                    }
+                } catch (e) {}
+            }, 1200);
+        }
+
+        function pushCloudRoomSnapshot(ep, code) {
+            if (!netState.isHost) return Promise.resolve();
+            const payload = {
+                updatedAt: Date.now(),
+                started: !!gameState,
+                roster: netState.lobbyRoster,
+                state: gameState || null
+            };
+            if (ep.mode === 'firebase') {
+                return fetch(ep.roomUrl, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).catch(() => {});
+            }
+            return fetch(ep.hostTopicUrl, {
+                method: 'POST',
+                body: JSON.stringify(Object.assign({ type: 'cloud_sync', roomCode: code }, payload))
+            }).catch(() => {});
+        }
+
+        function updateHostPlayerInfo() {
+            const roleId = document.getElementById('host-role').value;
+            const role = ROLES.find(r => r.id === roleId);
+            document.getElementById('host-role-desc').textContent = role ? role.desc : '';
+            if (netState.isHost && !gameState) {
+                rebuildHostLobbyRoster();
+                broadcastLobbyRoster();
+            }
+        }
+
+        function updateJoinRoleDesc() {
+            const roleId = document.getElementById('join-role').value;
+            const role = ROLES.find(r => r.id === roleId);
+            document.getElementById('join-role-desc').textContent = role ? role.desc : '';
+        }
+
+        function rebuildHostLobbyRoster() {
+            const hostName = document.getElementById('host-name').value.trim() || 'Капитан Громов';
+            const hostRoleId = document.getElementById('host-role').value;
+            const hostRole = ROLES.find(r => r.id === hostRoleId) || ROLES[0];
+
+            const roster = [
+                {
+                    peerId: netState.myPeerId || 'host',
+                    name: hostName,
+                    roleId: hostRole.id,
+                    roleName: hostRole.name,
+                    isHost: true
+                }
+            ];
+
+            netState.connections.forEach((item, idx) => {
+                const r = ROLES.find(x => x.id === item.roleId) || ROLES[(idx + 1) % ROLES.length];
+                roster.push({
+                    peerId: item.peerId,
+                    name: item.name,
+                    roleId: r.id,
+                    roleName: r.name,
+                    isHost: false
+                });
+            });
+
+            netState.lobbyRoster = roster;
+            renderHostLobbyRoster();
+        }
+
+        function renderHostLobbyRoster() {
+            const container = document.getElementById('host-lobby-players');
+            const countEl = document.getElementById('host-lobby-count');
+            const startBtn = document.getElementById('btn-start-network-game');
+
+            countEl.textContent = netState.lobbyRoster.length;
+            container.innerHTML = netState.lobbyRoster.map((p, idx) => {
+                const color = PLAYER_COLORS[idx];
+                return `
+                <div class="p-2 bg-[#f4ecdc] border border-[#2c261f] rounded flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-full inline-block border border-black" style="background:${color.hex};"></span>
+                        <div>
+                            <div class="font-bold text-xs">${p.name} ${p.isHost ? '<span class="text-[#991b1b]">[ХОСТ]</span>' : ''}</div>
+                            <div class="text-[10px] text-[#52493d]">${p.roleName}</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-bold text-[#166534]">Готов</span>
+                </div>`;
+            }).join('');
+
+            const validCount = netState.lobbyRoster.length >= 2 && netState.lobbyRoster.length <= 4;
+            startBtn.disabled = !validCount;
+            startBtn.textContent = validCount
+                ? `Начать дежурство (${netState.lobbyRoster.length} опер.)`
+                : 'Начать дежурство (нужно 2–4 игрока)';
+        }
+
+        function broadcastLobbyRoster() {
+            if (netState.transport === 'cloud' && netState.isHost && CLOUD_RTDB_URL) {
+                const base = CLOUD_RTDB_URL.replace(/\/+$/, '');
+                pushCloudRoomSnapshot(`${base}/rooms/${encodeURIComponent(netState.roomCode)}.json`);
+            }
+            netState.connections.forEach(item => {
+                if (item.conn && item.conn.open) {
+                    item.conn.send({
+                        type: 'lobby_update',
+                        roster: netState.lobbyRoster
+                    });
+                }
+            });
+        }
+
+        function copyInviteLink() {
+            const input = document.getElementById('host-invite-link');
+            if (!input || !input.value) return;
+            input.select();
+            input.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+            } catch (e) {}
+            const btn = document.getElementById('btn-copy-link');
+            const origText = btn.textContent;
+            btn.textContent = 'Скопировано!';
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-success');
+            setTimeout(() => {
+                btn.textContent = origText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-primary');
+            }, 1800);
+        }
+
+        function joinNetworkRoom() {
+            const rawCode = document.getElementById('join-room-code').value.trim().toUpperCase();
+            const joinName = document.getElementById('join-name').value.trim() || 'Оперативник';
+            const joinRoleId = document.getElementById('join-role').value;
+            const statusBox = document.getElementById('join-status-box');
+
+            if (!rawCode) {
+                statusBox.innerHTML = `<span class="text-[#991b1b] font-bold">Укажите код комнаты (например, OP-7740).</span>`;
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const useCloud = (urlParams.get('cloud') === '1' || typeof Peer === 'undefined');
+            if (useCloud) {
+                joinCloudRoom(rawCode, joinName, joinRoleId, statusBox, document.getElementById('btn-connect-room'));
+                return;
+            }
+
+            if (typeof Peer === 'undefined') {
+                statusBox.innerHTML = `<span class="text-[#991b1b] font-bold">Не удалось загрузить библиотеку PeerJS. Проверьте интернет.</span>`;
+                return;
+            }
+
+            destroyPeer();
+            netState.isHost = false;
+            netState.roomCode = rawCode;
+
+            const btn = document.getElementById('btn-connect-room');
+            btn.disabled = true;
+            statusBox.innerHTML = `Подключение к дежурной части <strong>${rawCode}</strong>...`;
+
+            let peer;
+            try {
+                peer = new Peer(buildPeerOptions(PEER_SIGNALING_SERVERS[0]));
+            } catch (err) {
+                btn.disabled = false;
+                statusBox.innerHTML = `<span class="text-[#991b1b] font-bold">Сетевые соединения (WebSocket) заблокированы в окне предпросмотра. Откройте игру по прямой ссылке на хостинге или выберите режим «За одним экраном».</span>`;
+                return;
+            }
+            netState.peer = peer;
+
+            let connectedOk = false;
+            let retryAttempted = false;
+            let connectTimer = null;
+
+            function scheduleConnectTimeout() {
+                clearTimeout(connectTimer);
+                connectTimer = setTimeout(() => {
+                    if (!connectedOk) {
+                        btn.disabled = false;
+                        statusBox.innerHTML = `<span class="text-[#991b1b] font-bold">Хост ${rawCode} не отвечает или сеть ограничивает прямое соединение WebRTC.</span> Убедитесь, что вкладка Хоста открыта и имеет статус «Связь: Активна» (переоткройте режим Хоста при необходимости), а также попробуйте сменить Wi-Fi / мобильный интернет.`;
+                    }
+                }, 10000);
+            }
+
+            function openDataChannel(myId) {
+                if (netState.hostConn) {
+                    try { netState.hostConn.close(); } catch (e) {}
+                }
+                const conn = peer.connect(PEER_PREFIX + rawCode, {
+                    reliable: true,
+                    serialization: 'json'
+                });
+                netState.hostConn = conn;
+
+                conn.on('open', () => {
+                    connectedOk = true;
+                    clearTimeout(connectTimer);
+                    statusBox.innerHTML = `<span class="text-[#166534] font-bold">Связь с комнатой ${rawCode} установлена!</span> Ожидаем, пока Хост откроет дело...`;
+                    conn.send({
+                        type: 'join_request',
+                        peerId: myId,
+                        name: joinName,
+                        roleId: joinRoleId
+                    });
+                });
+
+                conn.on('error', (connErr) => {
+                    const errCode = connErr && connErr.type ? connErr.type : '';
+                    if (!connectedOk && !retryAttempted) {
+                        retryAttempted = true;
+                        statusBox.innerHTML = `Сбой согласования канала (${errCode || 'сеть'}) с комнатой <strong>${rawCode}</strong>, повторная попытка подключения...`;
+                        setTimeout(() => {
+                            if (!connectedOk && peer && !peer.destroyed) {
+                                openDataChannel(myId);
+                            }
+                        }, 1200);
+                        return;
+                    }
+                    clearTimeout(connectTimer);
+                    btn.disabled = false;
+                    const errDetail = errCode ? ` (${errCode})` : '';
+                    const negHint = errCode === 'negotiation-failed'
+                        ? ' Ошибка <strong>negotiation-failed</strong> означает, что браузеры не смогли согласовать WebRTC-сигналы — чаще всего это вызывает строгий NAT/фаервол, блокировщик скриптов, сетевой фильтр или неактуальная вкладка Хоста.'
+                        : ' Чаще всего это происходит, если комната Хоста была закрыта/обновлена после отправки ссылки или сеть ограничивает WebRTC-трафик.';
+                    statusBox.innerHTML = `<span class="text-[#991b1b] font-bold">Ошибка канала связи с комнатой ${rawCode}${errDetail}.</span>${negHint} Попросите Хоста открыть игру в обычном браузере, нажать «Создать смену (Хост)» и прислать свежую ссылку.`;
+                });
+
+                conn.on('data', (data) => {
+                    handleClientIncomingData(data);
+                });
+
+                conn.on('close', () => {
+                    clearTimeout(connectTimer);
+                    if (!connectedOk && !retryAttempted) {
+                        retryAttempted = true;
+                        setTimeout(() => {
+                            if (!connectedOk && peer && !peer.destroyed) {
+                                openDataChannel(myId);
+                            }
+                        }, 900);
+                        return;
+                    }
+                    btn.disabled = false;
+                    if (!gameState) {
+                        statusBox.innerHTML = `<span class="text-[#991b1b] font-bold">Соединение с комнатой ${rawCode} разорвано.</span>`;
+                    } else {
+                        const badge = document.getElementById('net-status-badge');
+                        badge.textContent = 'Связь: Потеряна (Хост отключился)';
+                        badge.className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-[#fee2e2] text-[#991b1b] border border-[#991b1b]';
+                    }
+                });
+            }
+
+            scheduleConnectTimeout();
+
+            peer.on('open', (myId) => {
+                netState.myPeerId = myId;
+                openDataChannel(myId);
+            });
+
+            peer.on('error', (err) => {
+                clearTimeout(connectTimer);
+                statusBox.innerHTML = `Прямой канал PeerJS недоступен (${err.type || 'сеть'}), подключаемся через облачный канал...`;
+                joinCloudRoom(rawCode, joinName, joinRoleId, statusBox, btn);
+            });
+        }
+
+        function joinCloudRoom(rawCode, joinName, joinRoleId, statusBox, btn) {
+            destroyPeer();
+            netState.isHost = false;
+            netState.isNetwork = true;
+            netState.transport = 'cloud';
+            netState.roomCode = rawCode;
+            netState.myPeerId = 'client-' + Math.random().toString(36).slice(2, 9);
+            let actionSeq = 0;
+
+            const ep = getCloudRoomEndpoints(rawCode);
+            statusBox.innerHTML = `Подключение к облачной комнате <strong>${rawCode}</strong>...`;
+
+            function sendCloudMessage(obj) {
+                if (ep.mode === 'firebase') {
+                    return fetch(ep.reqUrl(netState.myPeerId), {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(obj)
+                    }).catch(() => {});
+                }
+                return fetch(ep.clientTopicUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(obj)
+                }).catch(() => {});
+            }
+
+            sendCloudMessage({
+                type: 'join_request',
+                peerId: netState.myPeerId,
+                name: joinName,
+                roleId: joinRoleId,
+                updatedAt: Date.now()
+            }).then(() => {
+                statusBox.innerHTML = `<span class="text-[#166534] font-bold">Подключено к смене ${rawCode}!</span> Ожидаем старт дежурства...`;
+            });
+
+            netState.hostConn = {
+                open: true,
+                send: (msg) => {
+                    if (msg && msg.type === 'action') {
+                        actionSeq++;
+                        sendCloudMessage({
+                            type: 'action',
+                            peerId: netState.myPeerId,
+                            action: msg,
+                            actionSeq: actionSeq,
+                            updatedAt: Date.now()
+                        });
+                    }
+                },
+                close: () => {}
+            };
+
+            let lastSyncTime = Math.floor(Date.now() / 1000) - 5;
+            clearInterval(cloudPollTimer);
+            cloudPollTimer = setInterval(async () => {
+                if (!netState.isNetwork || netState.isHost) return;
+                try {
+                    if (ep.mode === 'firebase') {
+                        const res = await fetch(ep.roomUrl);
+                        const snap = await res.json();
+                        if (!snap) return;
+                        if (Array.isArray(snap.roster) && !snap.started) {
+                            handleClientIncomingData({ type: 'lobby_update', roster: snap.roster });
+                        }
+                        if (snap.started && snap.state) {
+                            handleClientIncomingData({ type: 'state_sync', state: snap.state });
+                        }
+                    } else {
+                        const pollUrl = `${ep.hostTopicUrl}/json?since=${lastSyncTime}`;
+                        const res = await fetch(pollUrl, { cache: 'no-store' });
+                        if (!res.ok) return;
+                        const text = await res.text();
+                        const lines = text.trim().split('\n').filter(Boolean);
+                        for (const line of lines) {
+                            let evt;
+                            try { evt = JSON.parse(line); } catch (e) { continue; }
+                            if (evt.time && evt.time > lastSyncTime) {
+                                lastSyncTime = evt.time;
+                            }
+                            if (evt.event !== 'message' || !evt.message) continue;
+                            let snap;
+                            try { snap = JSON.parse(evt.message); } catch (e) { continue; }
+                            if (!snap || snap.roomCode !== rawCode) continue;
+                            if (Array.isArray(snap.roster) && !snap.started) {
+                                handleClientIncomingData({ type: 'lobby_update', roster: snap.roster });
+                            }
+                            if (snap.started && snap.state) {
+                                handleClientIncomingData({ type: 'state_sync', state: snap.state });
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }, 1200);
+        }
+
+        function joinCloudRoom(rawCode, joinName, joinRoleId, statusBox, btn) {
+            destroyPeer();
+            netState.isHost = false;
+            netState.isNetwork = true;
+            netState.transport = 'cloud';
+            netState.roomCode = rawCode;
+            netState.myPeerId = 'client-' + Math.random().toString(36).slice(2, 9);
+            let actionSeq = 0;
+
+            const base = CLOUD_RTDB_URL.replace(/\/+$/, '');
+            const roomUrl = `${base}/rooms/${encodeURIComponent(rawCode)}.json`;
+            const reqUrl = `${base}/rooms/${encodeURIComponent(rawCode)}/requests/${encodeURIComponent(netState.myPeerId)}.json`;
+
+            statusBox.innerHTML = `Подключение к облачной комнате <strong>${rawCode}</strong>...`;
+
+            function pushReq(extra = {}) {
+                return fetch(reqUrl, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(Object.assign({
+                        peerId: netState.myPeerId,
+                        name: joinName,
+                        roleId: joinRoleId,
+                        updatedAt: Date.now()
+                    }, extra))
+                }).catch(() => {});
+            }
+
+            pushReq().then(() => {
+                statusBox.innerHTML = `<span class="text-[#166534] font-bold">Подключено к облачной смене ${rawCode}!</span> Ожидаем старт дежурства...`;
+            });
+
+            netState.hostConn = {
+                open: true,
+                send: (msg) => {
+                    if (msg && msg.type === 'action') {
+                        actionSeq++;
+                        pushReq({ action: msg, actionSeq: actionSeq });
+                    }
+                },
+                close: () => {}
+            };
+
+            clearInterval(cloudPollTimer);
+            cloudPollTimer = setInterval(async () => {
+                if (!netState.isNetwork || netState.isHost) return;
+                try {
+                    const res = await fetch(roomUrl);
+                    const snap = await res.json();
+                    if (!snap) return;
+                    if (Array.isArray(snap.roster) && !snap.started) {
+                        handleClientIncomingData({ type: 'lobby_update', roster: snap.roster });
+                    }
+                    if (snap.started && snap.state) {
+                        handleClientIncomingData({ type: 'state_sync', state: snap.state });
+                    }
+                } catch (e) {}
+            }, 1400);
+        }
+        function handleHostIncomingData(conn, data) {
+            if (!data || !data.type) return;
+
+            if (data.type === 'join_request') {
+                const peerId = data.peerId || (conn && conn.peer);
+                if (!peerId) return;
+                netState.connections = netState.connections.filter(c => c.peerId !== peerId);
+                netState.connections.push({
+                    conn: conn || null,
+                    peerId: peerId,
+                    name: data.name || 'Оперативник',
+                    roleId: data.roleId || ROLES[1].id
+                });
+                rebuildHostLobbyRoster();
+                broadcastLobbyRoster();
+                return;
+            }
+
+            if (data.type === 'action' && gameState) {
+                const senderIdx = gameState.players.findIndex(p => p.peerId === data.peerId);
+                if (senderIdx === -1) return;
+
+                if (data.action === 'trade') {
+                    if (data.payload && data.payload.fromId === senderIdx) {
+                        applyTradeAction(data.payload.fromId, data.payload.toId, data.payload.amount, data.payload.propVal);
+                    }
+                    return;
+                }
+
+                if (data.action === 'upgrade' || data.action === 'mortgage') {
+                    const cellSt = gameState.cells[data.cellId];
+                    if (cellSt && cellSt.owner === senderIdx) {
+                        if (data.action === 'upgrade') upgradeProperty(data.cellId, true);
+                        if (data.action === 'mortgage') toggleMortgage(data.cellId, true);
+                    }
+                    return;
+                }
+
+                if (gameState.currentPlayerIdx !== senderIdx) return;
+
+                switch (data.action) {
+                    case 'roll':
+                        handleRollDice(true);
+                        break;
+                    case 'bail':
+                        bailOutOfJail(true);
+                        break;
+                    case 'buy':
+                        buyCurrentCell(true);
+                        break;
+                    case 'decline':
+                        declineBuy(true);
+                        break;
+                    case 'end_turn':
+                        endTurn(true);
+                        break;
+                }
+            }
+        }
+
+        function handleClientIncomingData(data) {
+            if (!data || !data.type) return;
+
+            if (data.type === 'error') {
+                const statusBox = document.getElementById('join-status-box');
+                statusBox.innerHTML = `<span class="text-[#991b1b] font-bold">${data.message}</span>`;
+                document.getElementById('btn-connect-room').disabled = false;
+                return;
+            }
+
+            if (data.type === 'lobby_update') {
+                const wrap = document.getElementById('join-lobby-players-wrap');
+                const list = document.getElementById('join-lobby-players');
+                wrap.classList.remove('hidden');
+                list.innerHTML = data.roster.map((p, idx) => `
+                    <div class="p-1.5 bg-white border border-[#2c261f] flex justify-between items-center text-[11px]">
+                        <span><strong>${idx + 1}. ${p.name}</strong> (${p.roleName})</span>
+                        ${p.isHost ? '<span class="text-[#991b1b] font-bold">ХОСТ</span>' : ''}
+                    </div>
+                `).join('');
+                return;
+            }
+
+            if (data.type === 'game_start' || data.type === 'state_sync') {
+                const firstStart = !gameState;
+                gameState = data.state;
+                netState.isNetwork = true;
+                netState.isHost = false;
+                netState.myPlayerIdx = gameState.players.findIndex(p => p.peerId === netState.myPeerId);
+
+                if (firstStart) {
+                    document.getElementById('lobby-screen').classList.add('hidden');
+                    document.getElementById('game-screen').classList.remove('hidden');
+                    buildBoardDOM();
+                }
+
+                syncClientVisuals();
+                updateUI();
+            }
+        }
+
+        function broadcastGameState(msgType = 'state_sync') {
+            if (!netState.isNetwork || !netState.isHost || !gameState) return;
+            if (netState.transport === 'cloud') {
+                const ep = getCloudRoomEndpoints(netState.roomCode);
+                pushCloudRoomSnapshot(ep, netState.roomCode);
+            }
+            const payload = {
+                type: msgType,
+                state: gameState
+            };
+            netState.connections.forEach(item => {
+                if (item.conn && item.conn.open) {
+                    item.conn.send(payload);
+                }
+            });
+        }
+
+        function sendClientAction(action, extra = {}) {
+            if (!netState.hostConn || !netState.hostConn.open) return;
+            netState.hostConn.send({
+                type: 'action',
+                peerId: netState.myPeerId,
+                action: action,
+                ...extra
+            });
+        }
+
+        function syncClientVisuals() {
+            if (!gameState) return;
+            const d1El = document.getElementById('die-1');
+            const d2El = document.getElementById('die-2');
+            if (d1El && d2El && gameState.lastDice) {
+                d1El.textContent = gameState.lastDice[0];
+                d2El.textContent = gameState.lastDice[1];
+            }
+            const statusEl = document.getElementById('matrix-status');
+            if (statusEl && gameState.matrixText) {
+                statusEl.textContent = gameState.matrixText;
+            }
+            if (gameState.actionPanel) {
+                setActionPanel(gameState.actionPanel.content, gameState.actionPanel.buttons, true);
+            }
+            const logEl = document.getElementById('game-log');
+            if (logEl && Array.isArray(gameState.logs)) {
+                logEl.innerHTML = gameState.logs.map(item =>
+                    `<div class="border-b border-[#d5c5a7] pb-1 leading-snug ${item.css}"><span class="text-[10px] text-[#78716c]">[${item.time}]</span> ${item.text}</div>`
+                ).join('');
+            }
+        }
+
+        function updateNetBadge() {
+            const badge = document.getElementById('net-status-badge');
+            if (!badge) return;
+            if (!netState.isNetwork) {
+                badge.classList.add('hidden');
+                return;
+            }
+            badge.classList.remove('hidden');
+            const onlineCount = netState.isHost
+                ? 1 + netState.connections.filter(c => c.conn && c.conn.open).length
+                : gameState.players.filter(p => !p.bankrupt).length;
+            badge.textContent = `Связь: Активна (${netState.roomCode} • Онлайн: ${onlineCount})`;
+            badge.className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-[#dcfce7] text-[#166534] border border-[#166534]';
+        }
+
+        function destroyPeer() {
+            clearInterval(cloudPollTimer);
+            cloudPollTimer = null;
+            if (netState.peer) {
+                try { netState.peer.destroy(); } catch (e) {}
+            }
+            netState.peer = null;
+            netState.hostConn = null;
+            netState.connections = [];
+            netState.lastProcessedSeq = {};
+            netState.transport = 'peerjs';
+            netState.isNetwork = false;
+            netState.myPlayerIdx = null;
+        }
+
+        /* ==========================================================================
+           ЛОББИ HOT-SEAT И ЗАПУСК ИГРЫ
+           ========================================================================== */
+        function setPlayerCount(count) {
+            setupCount = count;
+            [2, 3, 4].forEach(n => {
+                const btn = document.getElementById(`cnt-btn-${n}`);
+                if (!btn) return;
+                if (n === count) {
+                    btn.classList.add('btn-primary');
+                } else {
+                    btn.classList.remove('btn-primary');
+                }
+            });
+
+            const grid = document.getElementById('players-setup-grid');
+            const defaultNames = ['Капитан Громов', 'Майор Волкова', 'Полковник Соколов', 'Лейтенант Белов'];
+            let html = '';
+
+            for (let i = 0; i < count; i++) {
+                const color = PLAYER_COLORS[i];
+                const roleOptions = ROLES.map((r, idx) =>
+                    `<option value="${r.id}" ${idx === i % ROLES.length ? 'selected' : ''}>${r.name} (${r.badge})</option>`
+                ).join('');
+
+                html += `
+                <div class="kraft-card p-3.5 rounded">
+                    <div class="flex items-center justify-between border-b border-[#2c261f] pb-2 mb-2.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full inline-block border border-black" style="background:${color.hex};"></span>
+                            <span class="font-bold text-xs uppercase">Оперативник № ${i + 1}</span>
+                        </div>
+                        <span class="text-[11px] text-[#52493d] font-bold">Жетон: ${color.name}</span>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <label class="block font-bold mb-1">Позывной / ФИО:</label>
+                            <input type="text" id="setup-name-${i}" value="${defaultNames[i]}" maxlength="22" class="w-full p-1.5 bg-white border border-[#2c261f] font-mono">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">Личное дело (Роль):</label>
+                            <select id="setup-role-${i}" onchange="updateSetupRoleDesc(${i})" class="w-full p-1.5 bg-white border border-[#2c261f] font-mono">
+                                ${roleOptions}
+                            </select>
+                        </div>
+                        <div id="setup-role-desc-${i}" class="p-2 bg-[#e7dcc6] border border-[#b8ad9b] text-[11px] leading-snug">
+                            ${ROLES[i % ROLES.length].desc}
+                        </div>
+                    </div>
+                </div>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        function updateSetupRoleDesc(idx) {
+            const roleId = document.getElementById(`setup-role-${idx}`).value;
+            const role = ROLES.find(r => r.id === roleId);
+            document.getElementById(`setup-role-desc-${idx}`).textContent = role ? role.desc : '';
+        }
+
+        function startHotSeatGame() {
+            destroyPeer();
+            const players = [];
+            for (let i = 0; i < setupCount; i++) {
+                const nameInput = document.getElementById(`setup-name-${i}`).value.trim();
+                const roleId = document.getElementById(`setup-role-${i}`).value;
+                const role = ROLES.find(r => r.id === roleId) || ROLES[0];
+                players.push({
+                    id: i,
+                    peerId: null,
+                    name: nameInput || `Опер №${i + 1}`,
+                    role: role,
+                    color: PLAYER_COLORS[i].hex,
+                    cash: role.startCash,
+                    pos: 0,
+                    inJail: false,
+                    jailTurns: 0,
+                    insiderImmunityUsed: false,
+                    bankrupt: false
+                });
+            }
+
+            initGameEngine(players, false);
+        }
+
+        function startNetworkGame() {
+            if (!netState.isHost || netState.lobbyRoster.length < 2) return;
+            rebuildHostLobbyRoster();
+
+            const players = netState.lobbyRoster.map((item, i) => {
+                const role = ROLES.find(r => r.id === item.roleId) || ROLES[i % ROLES.length];
+                return {
+                    id: i,
+                    peerId: item.peerId,
+                    name: item.name,
+                    role: role,
+                    color: PLAYER_COLORS[i].hex,
+                    cash: role.startCash,
+                    pos: 0,
+                    inJail: false,
+                    jailTurns: 0,
+                    insiderImmunityUsed: false,
+                    bankrupt: false
+                };
+            });
+
+            netState.isNetwork = true;
+            netState.myPlayerIdx = 0;
+
+            initGameEngine(players, true);
+            broadcastGameState('game_start');
+        }
+
+        function initGameEngine(players, isNetwork) {
+            const cellsState = {};
+            BOARD_CELLS.forEach(c => {
+                if (['prop', 'hub', 'utility'].includes(c.type)) {
+                    cellsState[c.id] = {
+                        owner: null,
+                        level: 0, // 0..3
+                        mortgaged: false
+                    };
+                }
+            });
+
+            gameState = {
+                players: players,
+                cells: cellsState,
+                currentPlayerIdx: 0,
+                turnNumber: 1,
+                usbFund: 100,
+                hasRolled: false,
+                doublesStreak: 0,
+                lastDice: [1, 1],
+                planPerekhvatRounds: 0,
+                matrixText: 'Матрица кубиков: ожидание броска оперативника',
+                actionPanel: {
+                    content: `<div class="font-bold uppercase text-[#52493d] mb-1">Текущая диспозиция:</div><p>Нажмите <strong>«Бросить кубики»</strong>, чтобы начать патрулирование маршрута.</p>`,
+                    buttons: ''
+                },
+                logs: [],
+                winner: null
+            };
+
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            buildBoardDOM();
+            addLog(`Дело № 77/40-ОМ открыто (${isNetwork ? 'Сетевая смена ' + netState.roomCode : 'За одним экраном'}). На дежурство заступили ${players.length} оперативников. Первым ходит ${players[0].name}.`, 'system');
+            updateUI();
+        }
+
+        /* ==========================================================================
+           ПОСТРОЕНИЕ И ОТРИСОВКА ПОЛЯ 11x11 И КАРТОЧЕК ИГРОКОВ
+           ========================================================================== */
+        function getCellGridCoords(id) {
+            if (id >= 0 && id <= 10) return { row: 11, col: 11 - id };
+            if (id >= 11 && id <= 19) return { row: 11 - (id - 10), col: 1 };
+            if (id >= 20 && id <= 30) return { row: 1, col: 1 + (id - 20) };
+            return { row: 1 + (id - 30), col: 11 };
+        }
+
+        function buildBoardDOM() {
+            const board = document.getElementById('monopoly-board');
+            board.innerHTML = '';
+
+            BOARD_CELLS.forEach(cell => {
+                const { row, col } = getCellGridCoords(cell.id);
+                const isCorner = [0, 10, 20, 30].includes(cell.id);
+                const div = document.createElement('div');
+                div.id = `board-cell-${cell.id}`;
+                div.className = `board-cell ${isCorner ? 'corner-cell' : ''}`;
+                div.style.gridRow = row;
+                div.style.gridColumn = col;
+                div.onclick = () => openCellInspector(cell.id);
+
+                let topBarHtml = '';
+                if (cell.type === 'prop') {
+                    const sec = SECTORS[cell.sector];
+                    topBarHtml = `<div id="cell-bar-${cell.id}" class="sector-bar" style="background-color:${sec.color};"></div>`;
+                } else if (cell.type === 'hub' || cell.type === 'utility') {
+                    topBarHtml = `<div id="cell-bar-${cell.id}" class="sector-bar" style="background-color:#3f362b;"></div>`;
+                }
+
+                const priceLabel = cell.price ? `${cell.price} т.₽` : (cell.sub || '');
+
+                div.innerHTML = `
+                    ${topBarHtml}
+                    <div class="cell-title">${cell.name}</div>
+                    <div class="cell-price">${priceLabel}</div>
+                    <div id="cell-owner-${cell.id}"></div>
+                    <div id="cell-tokens-${cell.id}" class="tokens-container"></div>
+                `;
+                board.appendChild(div);
+            });
+
+            // Центральный пульт управления сменой
+            const center = document.createElement('div');
+            center.className = 'board-center';
+            center.innerHTML = `
+                <div class="flex flex-wrap justify-between items-center border-b-2 border-[#2c261f] pb-2 gap-2">
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-[#52493d]">Дежурный оперативник:</div>
+                        <div id="center-player-name" class="text-sm md:text-base font-bold uppercase flex items-center gap-1.5"></div>
+                        <div id="center-player-role" class="text-[11px] text-[#991b1b] font-bold"></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] uppercase font-bold text-[#52493d]">Наличный оклад:</div>
+                        <div id="center-player-cash" class="text-base md:text-lg font-bold text-[#166534]"></div>
+                    </div>
+                </div>
+
+                <div id="plan-perekhvat-banner" class="hidden bg-[#991b1b] text-white text-center text-[11px] font-bold uppercase py-1 px-2 rounded">
+                    ВНИМАНИЕ: ДЕЙСТВУЕТ «ПЛАН ПЕРЕХВАТ» (ДУБЛЬ 6-6) — ВСЯ АРЕНДА ×2!
+                </div>
+
+                <div class="my-auto py-1 flex flex-col items-center gap-2">
+                    <div class="flex items-center gap-3">
+                        <div id="die-1" class="dice-box">1</div>
+                        <div id="die-2" class="dice-box">1</div>
+                    </div>
+                    <div id="matrix-status" class="text-[11px] text-center font-bold text-[#1e3a8a] bg-[#f4ecdc] border border-[#857865] px-2.5 py-1 rounded max-w-md">
+                        Матрица кубиков: ожидание броска оперативника
+                    </div>
+                </div>
+
+                <div class="kraft-card p-2.5 text-xs space-y-2">
+                    <div id="action-panel-content" class="leading-snug"></div>
+                    <div id="action-panel-buttons" class="flex flex-wrap gap-1.5"></div>
+                </div>
+
+                <div id="turn-controls-wrap" class="flex flex-wrap gap-2 justify-center pt-1">
+                    <button id="btn-roll" onclick="handleRollDice()" class="btn-case btn-primary flex-1">
+                        Бросить кубики
+                    </button>
+                    <button id="btn-end-turn" onclick="endTurn()" class="btn-case flex-1" disabled>
+                        Передать смену
+                    </button>
+                </div>
+                <div id="waiting-turn-banner" class="hidden text-center text-xs font-bold uppercase py-1.5 px-2 bg-[#f4ecdc] border border-[#2c261f] rounded text-[#991b1b]">
+                    Сейчас ходит: <span id="waiting-turn-name"></span>
+                </div>
+            `;
+            board.appendChild(center);
+        }
+
+        function renderBoardCells() {
+            const activePlayer = gameState.players[gameState.currentPlayerIdx];
+
+            BOARD_CELLS.forEach(cell => {
+                const cellEl = document.getElementById(`board-cell-${cell.id}`);
+                const ownerEl = document.getElementById(`cell-owner-${cell.id}`);
+                const tokensEl = document.getElementById(`cell-tokens-${cell.id}`);
+                const barEl = document.getElementById(`cell-bar-${cell.id}`);
+                if (!cellEl) return;
+
+                cellEl.classList.toggle('active-highlight', activePlayer && !activePlayer.bankrupt && activePlayer.pos === cell.id);
+
+                const cState = gameState.cells[cell.id];
+                if (cState) {
+                    cellEl.classList.toggle('mortgaged', cState.mortgaged);
+                    if (cState.owner !== null) {
+                        const owner = gameState.players[cState.owner];
+                        ownerEl.innerHTML = `<span class="owner-badge" style="background-color:${owner.color};" title="Владелец: ${owner.name}"></span>`;
+                    } else {
+                        ownerEl.innerHTML = '';
+                    }
+                    if (barEl && cell.type === 'prop') {
+                        barEl.innerHTML = cState.level > 0
+                            ? `<span class="text-[9px] font-bold text-white drop-shadow">${'★'.repeat(cState.level)}</span>`
+                            : '';
+                    }
+                }
+
+                // Фишки оперативников на текущей клетке
+                const herePlayers = gameState.players.filter(p => !p.bankrupt && p.pos === cell.id);
+                tokensEl.innerHTML = herePlayers.map(p => {
+                    const isTurn = p.id === gameState.currentPlayerIdx;
+                    const initials = p.name.slice(0, 2).toUpperCase();
+                    return `<div class="player-token ${isTurn ? 'current-turn' : ''}" style="background-color:${p.color};" title="${p.name} (${p.role.name})">${initials}</div>`;
+                }).join('');
+            });
+        }
+
+        function renderPlayersRoster() {
+            const rosterEl = document.getElementById('players-roster');
+            if (!rosterEl) return;
+
+            rosterEl.innerHTML = gameState.players.map((p, idx) => {
+                const isTurn = idx === gameState.currentPlayerIdx && !p.bankrupt;
+                const isMe = netState.isNetwork && idx === netState.myPlayerIdx;
+                const ownedCells = BOARD_CELLS.filter(c => gameState.cells[c.id] && gameState.cells[c.id].owner === p.id);
+
+                const propsChips = ownedCells.length > 0
+                    ? ownedCells.map(c => {
+                        const st = gameState.cells[c.id];
+                        const dotColor = c.type === 'prop' ? SECTORS[c.sector].color : '#3f362b';
+                        const stars = st.level > 0 ? ` ${'★'.repeat(st.level)}` : '';
+                        const mort = st.mortgaged ? ' [З]' : '';
+                        return `<button type="button" onclick="openCellInspector(${c.id})" class="text-[10px] px-1.5 py-0.5 bg-white border border-[#2c261f] rounded hover:bg-[#fef3c7] flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full inline-block" style="background:${dotColor};"></span>
+                            <span>${c.name}${stars}${mort}</span>
+                        </button>`;
+                    }).join('')
+                    : `<span class="text-[10px] text-[#78716c]">Нет подконтрольных объектов</span>`;
+
+                return `
+                <div class="kraft-card p-2.5 rounded ${isTurn ? 'ring-2 ring-[#1e3a8a] bg-[#fffdf8]' : ''} ${p.bankrupt ? 'opacity-50' : ''}">
+                    <div class="flex justify-between items-center gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3.5 h-3.5 rounded-full inline-block border border-black flex-shrink-0" style="background:${p.color};"></span>
+                            <div>
+                                <div class="font-bold text-xs leading-tight">
+                                    ${p.name}
+                                    ${isMe ? '<span class="text-[#1e3a8a] text-[10px]">[ВЫ]</span>' : ''}
+                                    ${p.inJail ? '<span class="text-[#991b1b] text-[10px]">[В ИВС]</span>' : ''}
+                                    ${p.bankrupt ? '<span class="text-[#991b1b] text-[10px]">[УВОЛЕН]</span>' : ''}
+                                </div>
+                                <div class="text-[10px] text-[#52493d]">${p.role.name} • Поз. №${p.pos}</div>
+                            </div>
+                        </div>
+                        <div class="font-bold text-xs ${p.cash < 0 ? 'text-[#991b1b]' : 'text-[#166534]'}">
+                            ${p.bankrupt ? '0 т.₽' : `${p.cash} т.₽`}
+                        </div>
+                    </div>
+                    ${!p.bankrupt ? `<div class="mt-2 pt-1.5 border-t border-[#d5c5a7] flex flex-wrap gap-1">${propsChips}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        /* ==========================================================================
+           РАСЧЁТ ЦЕН, АРЕНДЫ, МОНОПОЛИЙ И ПЕРЕМЕЩЕНИЕ ПО КЛЕТКАМ
+           ========================================================================== */
+        function hasFullSector(playerId, sectorKey) {
+            if (!sectorKey || !SECTORS[sectorKey]) return false;
+            const sectorCells = BOARD_CELLS.filter(c => c.type === 'prop' && c.sector === sectorKey);
+            return sectorCells.every(c => {
+                const st = gameState.cells[c.id];
+                return st && st.owner === playerId && !st.mortgaged;
+            });
+        }
+
+        function getBuyPrice(cell, player) {
+            let price = cell.price;
+            if (player.role.id === 'insider') {
+                price = Math.round(price * 0.85);
+            }
+            return price;
+        }
+
+        function getUpgradeCost(cell, player) {
+            let cost = cell.upgradeCost;
+            if (player.role.id === 'veteran') {
+                cost = Math.round(cost * 0.9);
+            }
+            return cost;
+        }
+
+        function calculateRent(cell, tenant, diceSum) {
+            const cState = gameState.cells[cell.id];
+            const owner = gameState.players[cState.owner];
+            let rent = 0;
+            let notes = [];
+
+            if (cell.type === 'prop') {
+                const isMonopoly = hasFullSector(owner.id, cell.sector);
+                if (cState.level > 0) {
+                    rent = cell.rents[cState.level + 1];
+                    notes.push(`${LEVEL_NAMES[cState.level]}`);
+                } else if (isMonopoly) {
+                    rent = cell.rents[1];
+                    notes.push('Монополия сектора');
+                } else {
+                    rent = cell.rents[0];
+                    notes.push('База');
+                }
+
+                // Бонус Начальника ОБЭП (+25% с монопольных секторов)
+                if (owner.role.id === 'obep' && isMonopoly) {
+                    rent = Math.round(rent * 1.25);
+                    notes.push('ОБЭП +25%');
+                }
+            } else if (cell.type === 'hub') {
+                const hubCount = BOARD_CELLS.filter(c => c.type === 'hub' && gameState.cells[c.id].owner === owner.id && !gameState.cells[c.id].mortgaged).length;
+                const hubRates = [0, 25, 50, 100, 200];
+                rent = hubRates[hubCount] || 25;
+                notes.push(`Спецобъектов: ${hubCount}`);
+            } else if (cell.type === 'utility') {
+                const utilCount = BOARD_CELLS.filter(c => c.type === 'utility' && gameState.cells[c.id].owner === owner.id && !gameState.cells[c.id].mortgaged).length;
+                const mult = utilCount >= 2 ? 10 : 4;
+                rent = Math.max(diceSum, 2) * mult;
+                notes.push(`Кубики ×${mult}`);
+            }
+
+            // Бонус Следователя-аналитика (−20% аренды на чужих точках)
+            if (tenant.role.id === 'analyst') {
+                rent = Math.round(rent * 0.8);
+                notes.push('Аналитик −20%');
+            }
+
+            // План Перехват (дубль 6-6): аренда ×2
+            if (gameState.planPerekhvatRounds > 0) {
+                rent *= 2;
+                notes.push('План Перехват ×2');
+            }
+
+            return {
+                amount: rent,
+                breakdown: notes.length ? `(${notes.join(', ')})` : ''
+            };
+        }
+
+        function movePlayerSteps(player, steps, isDouble) {
+            const oldPos = player.pos;
+            const newPos = (oldPos + steps) % 40;
+
+            if (oldPos + steps >= 40) {
+                const salary = player.role.id === 'veteran' ? 230 : 200;
+                player.cash += salary;
+                addLog(`${player.name} прошёл Дежурную часть и получил оклад +${salary} тыс. ₽.`, 'good');
+            }
+
+            player.pos = newPos;
+            const cell = BOARD_CELLS[newPos];
+            addLog(`${player.name} переместился на клетку №${cell.id} «${cell.name}».`, 'move');
+
+            resolveCellLanding(player, cell, steps, isDouble);
+            checkBankruptcy(player, null);
+            updateUI();
+        }
+
+        function resolveCellLanding(player, cell, diceSum, isDouble) {
+            const extraDoubleNote = isDouble
+                ? `<div class="text-[#1e3a8a] font-bold mt-1">У вас дубль — после завершения действия можно бросить кубики снова!</div>`
+                : '';
+
+            if (cell.type === 'start') {
+                setActionPanel(
+                    `<div class="font-bold uppercase text-[#166534]">Дежурная часть (Старт)</div>
+                     <p>Оклад за прохождение круга уже зачислен на ваш счёт.</p>${extraDoubleNote}`,
+                    ''
+                );
+                return;
+            }
+
+            if (cell.type === 'reserve') {
+                const prize = gameState.usbFund;
+                player.cash += prize;
+                gameState.usbFund = 100; // Восстанавливаем базовый резерв
+                addLog(`${player.name} получил премию из Оперативного резерва: +${prize} тыс. ₽! Фонд обновлён до 100 тыс. ₽.`, 'good');
+                setActionPanel(
+                    `<div class="font-bold uppercase text-[#166534]">Оперативный резерв / Премия!</div>
+                     <p>Вы забираете накопленный фонд в размере <strong>+${prize} тыс. ₽</strong>!</p>${extraDoubleNote}`,
+                    ''
+                );
+                return;
+            }
+
+            if (cell.type === 'gotojail') {
+                addLog(`${player.name} попал на «Вызов в УСБ» и этапирован в ИВС (клетка 10)!`, 'danger');
+                sendToJail(player);
+                return;
+            }
+
+            if (cell.type === 'tax') {
+                payFineToFund(player, cell.amount, cell.name);
+                setActionPanel(
+                    `<div class="font-bold uppercase text-[#991b1b]">${cell.name}</div>
+                     <p>С вашего счёта списано <strong>${cell.amount} тыс. ₽</strong> в фонд УСБ.</p>${extraDoubleNote}`,
+                    ''
+                );
+                return;
+            }
+
+            if (cell.type === 'event' || cell.type === 'report') {
+                triggerEventCard(player, cell.type === 'report', extraDoubleNote);
+                return;
+            }
+
+            // Покупаемые объекты: prop, hub, utility
+            const cState = gameState.cells[cell.id];
+
+            // 1. Точка свободна
+            if (cState.owner === null) {
+                const buyPrice = getBuyPrice(cell, player);
+                const discountText = buyPrice < cell.price ? ` (со скидкой роли 15% вместо ${cell.price} т.₽)` : '';
+                const canAfford = player.cash >= buyPrice;
+
+                setActionPanel(
+                    `<div class="font-bold uppercase text-[#1e3a8a]">Свободный объект: ${cell.name}</div>
+                     <p>Стоимость оформления под контроль: <strong>${buyPrice} тыс. ₽</strong>${discountText}.</p>
+                     ${cell.type === 'prop' ? `<p class="text-[11px] text-[#52493d]">Сектор: ${SECTORS[cell.sector].name} | Базовая аренда: ${cell.rents[0]} т.₽</p>` : ''}
+                     ${extraDoubleNote}`,
+                    `<button onclick="buyCurrentCell()" class="btn-case btn-success" ${canAfford ? '' : 'disabled'}>Купить за ${buyPrice} т.₽</button>
+                     <button onclick="declineBuy()" class="btn-case">Отказаться</button>`
+                );
+                return;
+            }
+
+            // 2. Точка принадлежит самому игроку
+            if (cState.owner === player.id) {
+                let upgradeBtn = '';
+                if (cell.type === 'prop' && !cState.mortgaged && cState.level < 3) {
+                    const fullSec = hasFullSector(player.id, cell.sector);
+                    const upgCost = getUpgradeCost(cell, player);
+                    if (fullSec && player.cash >= upgCost) {
+                        upgradeBtn = `<button onclick="upgradeProperty(${cell.id})" class="btn-case btn-primary">Прокачать до «${LEVEL_NAMES[cState.level + 1]}» (${upgCost} т.₽)</button>`;
+                    }
+                }
+                setActionPanel(
+                    `<div class="font-bold uppercase text-[#166534]">Ваш объект: ${cell.name}</div>
+                     <p>Точка находится под вашим контролем. ${cState.mortgaged ? '<strong>Сейчас в залоге.</strong>' : ''}</p>${extraDoubleNote}`,
+                    upgradeBtn
+                );
+                return;
+            }
+
+            // 3. Точка принадлежит сопернику — автоматический расчёт и списание аренды
+            const owner = gameState.players[cState.owner];
+            if (cState.mortgaged) {
+                setActionPanel(
+                    `<div class="font-bold uppercase">Объект в залоге: ${cell.name}</div>
+                     <p>Точка принадлежит оперативнику <strong>${owner.name}</strong>, но заложена в банке — аренда не взимается.</p>${extraDoubleNote}`,
+                    ''
+                );
+                return;
+            }
+
+            const { amount, breakdown } = calculateRent(cell, player, diceSum);
+            transferMoney(player, owner, amount, `Аренда за «${cell.name}» ${breakdown}`);
+
+            setActionPanel(
+                `<div class="font-bold uppercase text-[#991b1b]">Чужая территория: ${cell.name}</div>
+                 <p>Владелец: <strong>${owner.name}</strong>. Автоматически списана аренда: <strong>${amount} тыс. ₽</strong> ${breakdown}.</p>${extraDoubleNote}`,
+                ''
+            );
+        }
+
+        function triggerEventCard(player, isReport, extraDoubleNote) {
+            const card = EVENT_CARDS[Math.floor(Math.random() * EVENT_CARDS.length)];
+            let analystBonusText = '';
+
+            // Бонус Следователя-аналитика на клетках «Рапорт / Событие»
+            if (isReport && player.role.id === 'analyst') {
+                player.cash += 50;
+                analystBonusText = `<div class="text-[#166534] font-bold mt-1">Бонус «Следователя-аналитика»: +50 тыс. ₽ за работу с архивом!</div>`;
+                addLog(`${player.name} (Аналитик) получил +50 тыс. ₽ за разбор архивного рапорта.`, 'good');
+            }
+
+            addLog(`Карточка «${card.title}» для ${player.name}: ${card.desc}`, 'event');
+
+            if (card.type === 'cash') {
+                player.cash += card.amount;
+            } else if (card.type === 'fine') {
+                payFineToFund(player, card.amount, card.title);
+            } else if (card.type === 'jail') {
+                sendToJail(player);
+                return;
+            } else if (card.type === 'collect_players') {
+                gameState.players.forEach(p => {
+                    if (!p.bankrupt && p.id !== player.id) {
+                        transferMoney(p, player, card.amount, card.title);
+                    }
+                });
+            } else if (card.type === 'prop_tax') {
+                const ownedProps = BOARD_CELLS.filter(c => gameState.cells[c.id] && gameState.cells[c.id].owner === player.id).length;
+                const totalFine = ownedProps * card.perProp;
+                if (totalFine > 0) {
+                    payFineToFund(player, totalFine, `${card.title} (${ownedProps} точек)`);
+                }
+            } else if (card.type === 'move') {
+                if (card.collectStart && player.pos > card.target) {
+                    const salary = player.role.id === 'veteran' ? 230 : 200;
+                    player.cash += salary;
+                    addLog(`${player.name} получил оклад +${salary} тыс. ₽ при переезде.`, 'good');
+                }
+                player.pos = card.target;
+                const targetCell = BOARD_CELLS[card.target];
+                resolveCellLanding(player, targetCell, 0, false);
+                return;
+            }
+
+            setActionPanel(
+                `<div class="font-bold uppercase text-[#1e3a8a]">${isReport ? 'Архив дела' : 'Оперативная сводка'}: ${card.title}</div>
+                 <p>${card.desc}</p>${analystBonusText}${extraDoubleNote}`,
+                ''
+            );
+        }
+
+        function sendToJail(player) {
+            // Иммунитет Оперативника-инсайдера при первой проверке УСБ
+            if (player.role.id === 'insider' && !player.insiderImmunityUsed) {
+                player.insiderImmunityUsed = true;
+                player.pos = 10;
+                player.inJail = false;
+                gameState.hasRolled = true;
+                gameState.doublesStreak = 0;
+                addLog(`Сработал иммунитет «Оперативника-инсайдера»! ${player.name} избежал ареста в ИВС.`, 'good');
+                setActionPanel(
+                    `<div class="font-bold uppercase text-[#166534]">Сработал иммунитет инсайдера!</div>
+                     <p>Связи в УСБ позволили вам избежать задержания в ИВС при первой проверке за партию.</p>`,
+                    ''
+                );
+                updateUI();
+                return;
+            }
+
+            player.pos = 10;
+            player.inJail = true;
+            player.jailTurns = 0;
+            gameState.hasRolled = true;
+            gameState.doublesStreak = 0;
+
+            setActionPanel(
+                `<div class="font-bold uppercase text-[#991b1b]">Вы задержаны и помещены в ИВС!</div>
+                 <p>В следующий ход потребуется выбросить дубль или внести залог <strong>100 тыс. ₽</strong>.</p>`,
+                ''
+            );
+            updateUI();
+        }
+
+        function payFineToFund(player, amount, reason) {
+            player.cash -= amount;
+            gameState.usbFund += amount;
+            addLog(`${player.name} перечислил ${amount} тыс. ₽ в фонд УСБ (${reason}).`, 'warn');
+            checkBankruptcy(player, null);
+        }
+
+        function transferMoney(fromPlayer, toPlayer, amount, reason) {
+            fromPlayer.cash -= amount;
+            toPlayer.cash += amount;
+            addLog(`${fromPlayer.name} → ${toPlayer.name}: ${amount} тыс. ₽ (${reason}).`, 'money');
+            checkBankruptcy(fromPlayer, toPlayer);
+        }
+
+        function checkBankruptcy(player, creditor) {
+            if (player.cash >= 0 || player.bankrupt) return;
+
+            // Проверяем, может ли игрок закрыть долг залогом точек
+            const unmortgagedProps = BOARD_CELLS.filter(c => gameState.cells[c.id] && gameState.cells[c.id].owner === player.id && !gameState.cells[c.id].mortgaged);
+            const maxLiquidation = unmortgagedProps.reduce((acc, c) => acc + Math.round(c.price * 0.5), 0);
+
+            if (player.cash + maxLiquidation < 0) {
+                // Полное банкротство («Увольнение по статье»)
+                player.bankrupt = true;
+                addLog(`УВОЛЬНЕНИЕ ПО СТАТЬЕ! Оперативник ${player.name} обанкротился и выбывает из дела!`, 'danger');
+
+                // Передача активов кредитору или освобождение в банк
+                BOARD_CELLS.forEach(c => {
+                    const st = gameState.cells[c.id];
+                    if (st && st.owner === player.id) {
+                        st.owner = creditor ? creditor.id : null;
+                        st.level = 0;
+                        st.mortgaged = false;
+                    }
+                });
+                player.cash = 0;
+                checkVictoryCondition();
+            } else {
+                addLog(`ВНИМАНИЕ! У ${player.name} отрицательный баланс (${player.cash} тыс. ₽). Заложите активы перед передачей смены!`, 'danger');
+            }
+        }
+
+        function checkVictoryCondition() {
+            const activePlayers = gameState.players.filter(p => !p.bankrupt);
+            if (activePlayers.length === 1) {
+                gameState.winner = activePlayers[0];
+                addLog(`ДЕЛО ЗАКРЫТО! Единственным решалой округа становится ${gameState.winner.name}!`, 'good');
+                setActionPanel(
+                    `<div class="font-bold uppercase text-sm text-[#166534]">Победа в деле № 77/40-ОМ!</div>
+                     <p>Оперативник <strong>${gameState.winner.name}</strong> (${gameState.winner.role.name}) устранил всех конкурентов с итоговым капиталом <strong>${gameState.winner.cash} тыс. ₽</strong>!</p>`,
+                    `<button onclick="confirmRestart()" class="btn-case btn-primary">Начать новое дело</button>`
+                );
+            }
+        }
+
+        /* ==========================================================================
+           ЛОГИКА ХОДА, КУБИКОВ И МАТРИЦЫ КОМБИНАЦИЙ
+           ========================================================================== */
+        function handleRollDice(fromRemote = false) {
+            if (netState.isNetwork && !netState.isHost) {
+                if (isMyTurn() && !gameState.hasRolled) {
+                    sendClientAction('roll');
+                }
+                return;
+            }
+
+            const player = gameState.players[gameState.currentPlayerIdx];
+            if (gameState.hasRolled || gameState.winner) return;
+
+            // Анимация кубиков
+            const d1El = document.getElementById('die-1');
+            const d2El = document.getElementById('die-2');
+            d1El.classList.add('dice-rolling');
+            d2El.classList.add('dice-rolling');
+
+            const d1 = Math.floor(Math.random() * 6) + 1;
+            const d2 = Math.floor(Math.random() * 6) + 1;
+            const sum = d1 + d2;
+            const isDouble = d1 === d2;
+
+            gameState.lastDice = [d1, d2];
+
+            setTimeout(() => {
+                d1El.classList.remove('dice-rolling');
+                d2El.classList.remove('dice-rolling');
+                d1El.textContent = d1;
+                d2El.textContent = d2;
+
+                processDiceResult(player, d1, d2, sum, isDouble);
+                broadcastGameState();
+            }, 320);
+        }
+
+        function processDiceResult(player, d1, d2, sum, isDouble) {
+            // Проверка нахождения в ИВС (клетка 10)
+            if (player.inJail) {
+                if (isDouble) {
+                    player.inJail = false;
+                    player.jailTurns = 0;
+                    addLog(`${player.name} выбросил дубль [${d1}-${d2}] и вышел из ИВС без штрафа!`, 'good');
+                    setMatrixStatus(`Дубль [${d1}-${d2}]: Освобождение из ИВС!`);
+                    movePlayerSteps(player, sum, false);
+                } else {
+                    player.jailTurns++;
+                    if (player.jailTurns >= 2) {
+                        player.inJail = false;
+                        player.jailTurns = 0;
+                        payFineToFund(player, 100, 'Обязательный выкуп из ИВС после срока проверки');
+                        movePlayerSteps(player, sum, false);
+                    } else {
+                        gameState.hasRolled = true;
+                        addLog(`${player.name} выбросил [${d1}-${d2}] и остаётся в ИВС (пропуск хода). Можно выкупиться за 100 тыс. ₽.`, 'warn');
+                        setActionPanel(
+                            `<div class="font-bold text-[#991b1b] uppercase">Задержание в ИВС</div>
+                             <p>Бросок [${d1}-${d2}] не дал дубля. Вы можете передать смену или внести залог <strong>100 тыс. ₽</strong> прямо сейчас.</p>`,
+                            player.cash >= 100 ? `<button onclick="bailOutOfJail()" class="btn-case btn-danger">Внести залог 100 т.₽ и пойти на ${sum} кл.</button>` : ''
+                        );
+                        updateUI();
+                    }
+                }
+                return;
+            }
+
+            // Проверка 3 дублей подряд
+            if (isDouble) {
+                gameState.doublesStreak++;
+                if (gameState.doublesStreak >= 3) {
+                    gameState.doublesStreak = 0;
+                    gameState.hasRolled = true;
+                    addLog(`ТРЕТИЙ ДУБЛЬ ПОДРЯД [${d1}-${d2}]! ${player.name} отправляется на проверку в ИВС!`, 'danger');
+                    setMatrixStatus(`3 дубля подряд — Вызов в УСБ (ИВС)!`);
+                    sendToJail(player);
+                    return;
+                }
+            } else {
+                gameState.doublesStreak = 0;
+            }
+
+            // Применение эффектов Матрицы комбинаций кубиков
+            applyDiceMatrixEffect(player, d1, d2, sum, isDouble);
+
+            // Если не дубль, ход после перемещения закрывается; если дубль — даём повторный бросок
+            gameState.hasRolled = !isDouble;
+            movePlayerSteps(player, sum, isDouble);
+        }
+
+        function bailOutOfJail(fromRemote = false) {
+            if (netState.isNetwork && !netState.isHost) {
+                if (isMyTurn()) sendClientAction('bail');
+                return;
+            }
+            const player = gameState.players[gameState.currentPlayerIdx];
+            if (!player.inJail || player.cash < 100) return;
+            payFineToFund(player, 100, 'Досрочный выкуп из ИВС');
+            player.inJail = false;
+            player.jailTurns = 0;
+            gameState.hasRolled = true;
+            const sum = gameState.lastDice[0] + gameState.lastDice[1];
+            movePlayerSteps(player, sum, false);
+            broadcastGameState();
+        }
+
+        function setMatrixStatus(text) {
+            if (gameState) gameState.matrixText = text;
+            const statusEl = document.getElementById('matrix-status');
+            if (statusEl) statusEl.textContent = text;
+        }
+
+        function applyDiceMatrixEffect(player, d1, d2, sum, isDouble) {
+            let msg = `Выпало [${d1} + ${d2} = ${sum}].`;
+
+            if (d1 === 1 && d2 === 1) {
+                player.cash += 50;
+                msg = `ДУБЛЬ 1-1: «Удачный обход»! Бонус +50 тыс. ₽ из казны (и повторный ход).`;
+                addLog(`${player.name}: дубль 1-1 приносит +50 тыс. ₽ из казны!`, 'good');
+            } else if (d1 === 3 && d2 === 3) {
+                player.cash += 75;
+                msg = `ДУБЛЬ 3-3: Внеочередная премия +75 тыс. ₽ из казны (и повторный ход).`;
+                addLog(`${player.name}: дубль 3-3 приносит премию +75 тыс. ₽!`, 'good');
+            } else if (d1 === 6 && d2 === 6) {
+                gameState.planPerekhvatRounds = gameState.players.filter(p => !p.bankrupt).length;
+                msg = `ДУБЛЬ 6-6: «ПЛАН ПЕРЕХВАТ»! Вся аренда на поле ×2 на 1 круг!`;
+                addLog(`${player.name} выбросил дубль 6-6! Объявлен «План Перехват» — аренда удваивается на 1 круг!`, 'danger');
+            } else if ((d1 === 3 && d2 === 4) || (d1 === 4 && d2 === 3)) {
+                const upgradable = BOARD_CELLS.filter(c =>
+                    c.type === 'prop' &&
+                    gameState.cells[c.id].owner === player.id &&
+                    !gameState.cells[c.id].mortgaged &&
+                    gameState.cells[c.id].level < 3
+                );
+                if (upgradable.length > 0) {
+                    const target = upgradable[0];
+                    gameState.cells[target.id].level++;
+                    msg = `КОМБО 3+4: Бесплатная прокачка точки «${target.name}» до уровня ${LEVEL_NAMES[gameState.cells[target.id].level]}!`;
+                    addLog(`${player.name} выбросил 3+4! Бесплатно усилена точка «${target.name}» (${LEVEL_NAMES[gameState.cells[target.id].level]}).`, 'good');
+                } else {
+                    player.cash += 40;
+                    msg = `КОМБО 3+4: Нет точек для апгрейда — компенсация +40 тыс. ₽ из казны!`;
+                    addLog(`${player.name} выбросил 3+4 и получил компенсацию +40 тыс. ₽.`, 'good');
+                }
+            } else if (isDouble) {
+                msg = `ДУБЛЬ [${d1}-${d2}]: Право на повторный бросок кубиков после хода!`;
+                addLog(`${player.name} выбросил дубль [${d1}-${d2}] — повторный бросок.`, 'system');
+            }
+
+            setMatrixStatus(msg);
+        }
+        function buyCurrentCell(fromRemote = false) {
+            if (netState.isNetwork && !netState.isHost) {
+                if (isMyTurn()) sendClientAction('buy');
+                return;
+            }
+            const player = gameState.players[gameState.currentPlayerIdx];
+            const cell = BOARD_CELLS[player.pos];
+            const cState = gameState.cells[cell.id];
+            if (!cState || cState.owner !== null) return;
+
+            const price = getBuyPrice(cell, player);
+            if (player.cash < price) return;
+
+            player.cash -= price;
+            cState.owner = player.id;
+            addLog(`${player.name} взял под контроль объект «${cell.name}» за ${price} тыс. ₽.`, 'good');
+
+            setActionPanel(
+                `<div class="font-bold uppercase text-[#166534]">Объект оформлен!</div>
+                 <p>«${cell.name}» теперь числится за оперативником <strong>${player.name}</strong>.</p>`,
+                ''
+            );
+            updateUI();
+            broadcastGameState();
+        }
+
+        function declineBuy(fromRemote = false) {
+            if (netState.isNetwork && !netState.isHost) {
+                if (isMyTurn()) sendClientAction('decline');
+                return;
+            }
+            const player = gameState.players[gameState.currentPlayerIdx];
+            const cell = BOARD_CELLS[player.pos];
+            addLog(`${player.name} отказался от оформления объекта «${cell.name}».`, 'system');
+            setActionPanel(
+                `<div class="font-bold uppercase">Отказ от объекта</div>
+                 <p>Точка «${cell.name}» остаётся свободной.</p>`,
+                ''
+            );
+            broadcastGameState();
+        }
+
+        function upgradeProperty(cellId, fromRemote = false) {
+            if (netState.isNetwork && !netState.isHost) {
+                sendClientAction('upgrade', { cellId: cellId });
+                return;
+            }
+            const cell = BOARD_CELLS[cellId];
+            const cState = gameState.cells[cellId];
+            if (!cell || cell.type !== 'prop' || cState.owner === null || cState.mortgaged || cState.level >= 3) return;
+
+            const owner = gameState.players[cState.owner];
+            if (!hasFullSector(owner.id, cell.sector)) return;
+
+            const cost = getUpgradeCost(cell, owner);
+            if (owner.cash < cost) return;
+
+            owner.cash -= cost;
+            cState.level++;
+            addLog(`${owner.name} усилил точку «${cell.name}» до уровня «${LEVEL_NAMES[cState.level]}» за ${cost} тыс. ₽.`, 'good');
+            updateUI();
+            broadcastGameState();
+            if (!document.getElementById('cell-modal').classList.contains('hidden')) {
+                openCellInspector(cellId);
+            }
+        }
+
+        function toggleMortgage(cellId, fromRemote = false) {
+            if (netState.isNetwork && !netState.isHost) {
+                sendClientAction('mortgage', { cellId: cellId });
+                return;
+            }
+            const cell = BOARD_CELLS[cellId];
+            const cState = gameState.cells[cellId];
+            if (!cState || cState.owner === null) return;
+
+            const owner = gameState.players[cState.owner];
+            const mortgageVal = Math.round(cell.price * 0.5);
+
+            if (!cState.mortgaged) {
+                if (cState.level > 0) return;
+                cState.mortgaged = true;
+                owner.cash += mortgageVal;
+                addLog(`${owner.name} заложил «${cell.name}» и получил +${mortgageVal} тыс. ₽.`, 'warn');
+            } else {
+                const redeemCost = Math.round(mortgageVal * 1.1);
+                if (owner.cash < redeemCost) return;
+                owner.cash -= redeemCost;
+                cState.mortgaged = false;
+                addLog(`${owner.name} выкупил «${cell.name}» из залога за ${redeemCost} тыс. ₽.`, 'good');
+            }
+            updateUI();
+            broadcastGameState();
+            openCellInspector(cellId);
+        }
+        function endTurn(fromRemote = false) {
+            if (netState.isNetwork && !netState.isHost) {
+                if (isMyTurn() && gameState.hasRolled) {
+                    sendClientAction('end_turn');
+                }
+                return;
+            }
+            const current = gameState.players[gameState.currentPlayerIdx];
+            if (!current.bankrupt && current.cash < 0) {
+                addLog(`Нельзя передать смену с отрицательным балансом (${current.cash} тыс. ₽)! Заложите точки в списке активов.`, 'danger');
+                return;
+            }
+
+            if (gameState.planPerekhvatRounds > 0) {
+                gameState.planPerekhvatRounds--;
+            }
+
+            // Переход к следующему не обанкротившемуся игроку
+            const total = gameState.players.length;
+            for (let step = 1; step <= total; step++) {
+                const nextIdx = (gameState.currentPlayerIdx + step) % total;
+                if (!gameState.players[nextIdx].bankrupt) {
+                    gameState.currentPlayerIdx = nextIdx;
+                    break;
+                }
+            }
+
+            gameState.turnNumber++;
+            gameState.hasRolled = false;
+            gameState.doublesStreak = 0;
+
+            const nextPlayer = gameState.players[gameState.currentPlayerIdx];
+            setMatrixStatus(`Матрица кубиков: ход перешёл к ${nextPlayer.name}`);
+            setActionPanel(
+                `<div class="font-bold uppercase text-[#52493d] mb-1">Новая смена: ${nextPlayer.name}</div>
+                 <p>${nextPlayer.inJail ? 'Вы находитесь в ИВС. Бросьте кубики (нужен дубль) или внесите выкуп.' : 'Нажмите <strong>«Бросить кубики»</strong> для продолжения патрулирования.'}</p>`,
+                ''
+            );
+            updateUI();
+            broadcastGameState();
+        }
+
+        /* ==========================================================================
+           ИНТЕРФЕЙС: ПАНЕЛИ, ИНСПЕКТОР ТОЧЕК, СДЕЛКИ И СПРАВКА
+           ========================================================================== */
+        function setActionPanel(contentHtml, buttonsHtml, fromSync = false) {
+            if (gameState && !fromSync) {
+                gameState.actionPanel = { content: contentHtml, buttons: buttonsHtml || '' };
+            }
+            document.getElementById('action-panel-content').innerHTML = contentHtml;
+            const btnsEl = document.getElementById('action-panel-buttons');
+            // В сетевой игре кнопки действия внутри карточки видны только активному игроку
+            if (netState.isNetwork && !isMyTurn()) {
+                btnsEl.innerHTML = '';
+            } else {
+                btnsEl.innerHTML = buttonsHtml || '';
+            }
+        }
+
+        function updateUI() {
+            if (!gameState) return;
+
+            const current = gameState.players[gameState.currentPlayerIdx];
+            const myTurn = isMyTurn();
+
+            document.getElementById('turn-counter').textContent = gameState.turnNumber;
+            document.getElementById('usb-fund-display').textContent = `${gameState.usbFund} тыс. ₽`;
+            updateNetBadge();
+
+            // Центральный заголовок
+            document.getElementById('center-player-name').innerHTML =
+                `<span class="w-3.5 h-3.5 rounded-full inline-block border border-black" style="background:${current.color};"></span> ${current.name}`;
+            document.getElementById('center-player-role').textContent = current.role.name;
+            document.getElementById('center-player-cash').textContent = `${current.cash} тыс. ₽`;
+
+            const banner = document.getElementById('plan-perekhvat-banner');
+            banner.classList.toggle('hidden', gameState.planPerekhvatRounds <= 0);
+
+            // Управление кнопками хода в сетевом и локальном режимах
+            const controlsWrap = document.getElementById('turn-controls-wrap');
+            const waitingBanner = document.getElementById('waiting-turn-banner');
+            const waitingName = document.getElementById('waiting-turn-name');
+
+            if (netState.isNetwork && !myTurn && !gameState.winner) {
+                controlsWrap.classList.add('hidden');
+                waitingBanner.classList.remove('hidden');
+                waitingName.textContent = current.name;
+            } else {
+                controlsWrap.classList.remove('hidden');
+                waitingBanner.classList.add('hidden');
+
+                const btnRoll = document.getElementById('btn-roll');
+                const btnEnd = document.getElementById('btn-end-turn');
+                btnRoll.disabled = gameState.hasRolled || !!gameState.winner || !myTurn;
+                btnEnd.disabled = !gameState.hasRolled || !!gameState.winner || !myTurn;
+            }
+
+            // Обновляем видимость кнопок внутри actionPanel при смене хода по сети
+            if (gameState.actionPanel) {
+                const btnsEl = document.getElementById('action-panel-buttons');
+                btnsEl.innerHTML = (netState.isNetwork && !myTurn) ? '' : (gameState.actionPanel.buttons || '');
+            }
+
+            renderBoardCells();
+            renderPlayersRoster();
+        }
+
+        function openCellInspector(cellId) {
+            const cell = BOARD_CELLS[cellId];
+            const cState = gameState.cells[cellId];
+            const modal = document.getElementById('cell-modal');
+            const secEl = document.getElementById('cell-modal-sector');
+            const titleEl = document.getElementById('cell-modal-title');
+            const bodyEl = document.getElementById('cell-modal-body');
+            const actionsEl = document.getElementById('cell-modal-actions');
+
+            titleEl.textContent = `№${cell.id} • ${cell.name}`;
+            actionsEl.innerHTML = '';
+
+            if (cell.type === 'prop') {
+                secEl.textContent = `Сектор: ${SECTORS[cell.sector].name}`;
+                secEl.style.backgroundColor = SECTORS[cell.sector].color;
+            } else {
+                secEl.textContent = 'Служебная клетка';
+                secEl.style.backgroundColor = '#2c261f';
+            }
+
+            if (!cState) {
+                bodyEl.innerHTML = `<p>${cell.sub || 'Специальная клетка маршрута патрулирования.'}</p>`;
+                modal.classList.remove('hidden');
+                return;
+            }
+
+            const owner = cState.owner !== null ? gameState.players[cState.owner] : null;
+            const mortgageVal = Math.round(cell.price * 0.5);
+            const redeemVal = Math.round(mortgageVal * 1.1);
+            const levelLabel = LEVEL_NAMES[cState.level] || LEVEL_NAMES[0];
+            const ownerText = owner
+                ? `<span class="font-bold" style="color:${owner.color};">${owner.name}</span> (${owner.role.name})`
+                : '<span class="text-[#166534] font-bold">Свободна</span>';
+
+            let detailsHtml = `
+                <div class="grid grid-cols-2 gap-1.5 bg-[#f4ecdc] p-2 border border-[#b8ad9b] rounded">
+                    <div><strong>Владелец:</strong> ${ownerText}</div>
+                    <div><strong>Статус:</strong> ${cState.mortgaged ? '<span class="text-[#991b1b] font-bold">В залоге</span>' : levelLabel}</div>
+                    <div><strong>Цена покупки:</strong> ${cell.price} тыс. ₽</div>
+                    <div><strong>Залог / Выкуп:</strong> ${mortgageVal} / ${redeemVal} т.₽</div>
+                </div>
+            `;
+
+            if (cell.type === 'prop') {
+                const fullSec = owner ? hasFullSector(owner.id, cell.sector) : false;
+                const upgCost = owner ? getUpgradeCost(cell, owner) : cell.upgradeCost;
+                detailsHtml += `
+                    <div class="text-[11px] space-y-1">
+                        <div><strong>Сектор:</strong> ${SECTORS[cell.sector].name} (полный сектор: ${fullSec ? 'Да' : 'Нет'}) • <strong>Апгрейд:</strong> ${upgCost} т.₽</div>
+                        <div><strong>Рента:</strong> База ${cell.rents[0]} • Монополия ${cell.rents[1]} • 1★ ${cell.rents[2]} • 2★★ ${cell.rents[3]} • 3★★★ ${cell.rents[4]} тыс. ₽</div>
+                    </div>
+                `;
+            } else if (cell.type === 'hub') {
+                detailsHtml += `<div class="text-[11px]"><strong>Спецобъект:</strong> рента зависит от числа спецобъектов у владельца (25 / 50 / 100 / 200 тыс. ₽).</div>`;
+            } else if (cell.type === 'utility') {
+                detailsHtml += `<div class="text-[11px]"><strong>Инфраструктура:</strong> рента равна сумме кубиков ×4 (или ×10 при наличии обоих объектов).</div>`;
+            }
+
+            bodyEl.innerHTML = detailsHtml;
+
+            // Кнопки управления, если точкой владеет один из игроков (в сети — только для своего владельца)
+            const canManageOwner = !netState.isNetwork || (owner && owner.id === getMyPlayerId());
+            if (owner && canManageOwner) {
+                if (cell.type === 'prop' && !cState.mortgaged && cState.level < 3) {
+                    const fullSec = hasFullSector(owner.id, cell.sector);
+                    const upgCost = getUpgradeCost(cell, owner);
+                    actionsEl.innerHTML += `<button onclick="upgradeProperty(${cell.id})" class="btn-case btn-primary" ${fullSec && owner.cash >= upgCost ? '' : 'disabled'}>Прокачать (${upgCost} т.₽)</button>`;
+                }
+                if (cState.level === 0) {
+                    const mortVal = Math.round(cell.price * 0.5);
+                    const redeemVal = Math.round(mortVal * 1.1);
+                    if (!cState.mortgaged) {
+                        actionsEl.innerHTML += `<button onclick="toggleMortgage(${cell.id})" class="btn-case">Заложить (+${mortVal} т.₽)</button>`;
+                    } else {
+                        actionsEl.innerHTML += `<button onclick="toggleMortgage(${cell.id})" class="btn-case btn-success" ${owner.cash >= redeemVal ? '' : 'disabled'}>Выкупить (${redeemVal} т.₽)</button>`;
+                    }
+                }
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        /* ==========================================================================
+           СДЕЛКИ МЕЖДУ ОПЕРАТИВНИКАМИ
+           ========================================================================== */
+        function openTradeModal() {
+            const activePlayers = gameState.players.filter(p => !p.bankrupt);
+            if (activePlayers.length < 2) return;
+
+            const defaultFromId = netState.isNetwork ? getMyPlayerId() : gameState.currentPlayerIdx;
+            const fromSel = document.getElementById('trade-from');
+            const toSel = document.getElementById('trade-to');
+
+            if (netState.isNetwork) {
+                const me = gameState.players[defaultFromId];
+                if (!me || me.bankrupt) return;
+                fromSel.innerHTML = `<option value="${me.id}" selected>${me.name} (${me.cash} т.₽)</option>`;
+            } else {
+                fromSel.innerHTML = activePlayers.map(p => `<option value="${p.id}" ${p.id === defaultFromId ? 'selected' : ''}>${p.name} (${p.cash} т.₽)</option>`).join('');
+            }
+            toSel.innerHTML = activePlayers.filter(p => p.id !== defaultFromId).map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+            document.getElementById('trade-amount').value = 0;
+            document.getElementById('trade-error').classList.add('hidden');
+            updateTradeForm();
+            document.getElementById('trade-modal').classList.remove('hidden');
+        }
+
+        function updateTradeForm() {
+            const fromId = parseInt(document.getElementById('trade-from').value, 10);
+            const propSel = document.getElementById('trade-property');
+            const owned = BOARD_CELLS.filter(c => gameState.cells[c.id] && gameState.cells[c.id].owner === fromId && gameState.cells[c.id].level === 0);
+
+            propSel.innerHTML = `<option value="">— Без передачи точки —</option>` +
+                owned.map(c => `<option value="${c.id}">${c.name} (${c.price} т.₽)</option>`).join('');
+        }
+
+        function executeTrade() {
+            const fromId = parseInt(document.getElementById('trade-from').value, 10);
+            const toId = parseInt(document.getElementById('trade-to').value, 10);
+            const amount = Math.max(0, parseInt(document.getElementById('trade-amount').value || '0', 10));
+            const propVal = document.getElementById('trade-property').value;
+            const errEl = document.getElementById('trade-error');
+
+            if (fromId === toId) {
+                errEl.textContent = 'Нельзя оформить сделку с самим собой.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            const fromPlayer = gameState.players[fromId];
+            const toPlayer = gameState.players[toId];
+
+            if (amount > fromPlayer.cash) {
+                errEl.textContent = `У оперативника ${fromPlayer.name} недостаточно средств (доступно ${fromPlayer.cash} тыс. ₽).`;
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            if (amount === 0 && !propVal) {
+                errEl.textContent = 'Укажите сумму перевода или выберите точку для передачи.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            if (netState.isNetwork && !netState.isHost) {
+                sendClientAction('trade', {
+                    payload: { fromId, toId, amount, propVal }
+                });
+                closeModal('trade-modal');
+                return;
+            }
+
+            applyTradeAction(fromId, toId, amount, propVal);
+            closeModal('trade-modal');
+        }
+
+        function applyTradeAction(fromId, toId, amount, propVal) {
+            const fromPlayer = gameState.players[fromId];
+            const toPlayer = gameState.players[toId];
+            if (!fromPlayer || !toPlayer || amount > fromPlayer.cash) return;
+
+            if (amount > 0) {
+                fromPlayer.cash -= amount;
+                toPlayer.cash += amount;
+            }
+
+            let propNote = '';
+            if (propVal) {
+                const cellId = parseInt(propVal, 10);
+                if (gameState.cells[cellId] && gameState.cells[cellId].owner === fromId && gameState.cells[cellId].level === 0) {
+                    gameState.cells[cellId].owner = toId;
+                    propNote = ` и передал объект «${BOARD_CELLS[cellId].name}»`;
+                }
+            }
+
+            addLog(`СДЕЛКА: ${fromPlayer.name} перевёл ${amount} тыс. ₽${propNote} оперативнику ${toPlayer.name}.`, 'money');
+            updateUI();
+            broadcastGameState();
+        }
+
+        /* ==========================================================================
+           ПРОТОКОЛ СМЕНЫ (ЛОГ) И СПРАВОЧНИК
+           ========================================================================== */
+        function addLog(text, type = 'system') {
+            const logEl = document.getElementById('game-log');
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const colors = {
+                system: 'text-[#1c1915]',
+                good: 'text-[#166534] font-bold',
+                danger: 'text-[#991b1b] font-bold',
+                warn: 'text-[#b45309] font-bold',
+                money: 'text-[#1e3a8a]',
+                event: 'text-[#6b21a8] font-bold',
+                move: 'text-[#52493d]'
+            };
+
+            const cssClass = colors[type] || colors.system;
+            if (gameState && Array.isArray(gameState.logs)) {
+                gameState.logs.unshift({ time: timeStr, text: text, css: cssClass });
+                if (gameState.logs.length > 80) gameState.logs.pop();
+            }
+
+            const entry = document.createElement('div');
+            entry.className = `border-b border-[#d5c5a7] pb-1 leading-snug ${cssClass}`;
+            entry.innerHTML = `<span class="text-[10px] text-[#78716c]">[${timeStr}]</span> ${text}`;
+            logEl.prepend(entry);
+        }
+
+        function renderRulesTable() {
+            const tbody = document.getElementById('rules-price-tbody');
+            const props = BOARD_CELLS.filter(c => c.type === 'prop');
+            tbody.innerHTML = props.map(c => {
+                const sec = SECTORS[c.sector];
+                return `
+                <tr class="odd:bg-white even:bg-[#f4ecdc]">
+                    <td class="p-1.5 border border-[#2c261f] font-bold"><span class="inline-block w-2.5 h-2.5 rounded-full mr-1" style="background:${sec.color};"></span>${sec.name}</td>
+                    <td class="p-1.5 border border-[#2c261f] font-bold">${c.name}</td>
+                    <td class="p-1.5 border border-[#2c261f]">${c.price}</td>
+                    <td class="p-1.5 border border-[#2c261f]">${Math.round(c.price * 0.5)}</td>
+                    <td class="p-1.5 border border-[#2c261f]">${c.upgradeCost}</td>
+                    <td class="p-1.5 border border-[#2c261f]">${c.rents[0]}</td>
+                    <td class="p-1.5 border border-[#2c261f]">${c.rents[1]}</td>
+                    <td class="p-1.5 border border-[#2c261f]">${c.rents[2]}</td>
+                    <td class="p-1.5 border border-[#2c261f]">${c.rents[3]}</td>
+                    <td class="p-1.5 border border-[#2c261f] font-bold text-[#991b1b]">${c.rents[4]}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openRulesModal() {
+            document.getElementById('rules-modal').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function confirmRestart() {
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                closeModal('confirm-modal');
+                destroyPeer();
+                gameState = null;
+                // Очищаем ?room=... из URL при выходе в стартовое лобби
+                const cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('room');
+                window.history.replaceState({}, '', cleanUrl.toString());
+
+                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('lobby-screen').classList.remove('hidden');
+                initLobby();
+            };
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        window.onload = function () {
+            initLobby();
+        };
+    </script>
+</body>
+</html>
